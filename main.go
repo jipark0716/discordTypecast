@@ -8,7 +8,7 @@ import (
 	"os"
 	"io/ioutil"
 
-	// "github.com/bwmarrin/dgvoice"
+	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jipark0716/typecastGo"
 )
@@ -20,12 +20,12 @@ const (
 	COMMENT_NOTFOUND = "지원하지 않는 명령어입니다. 도움말이 확인하려면 \"&도움\"을 입력하세요."
 )
 
-var VoiceConnections map[string]*VoiceConnection
+var VoiceConnections map[string]*discordgo.VoiceConnection
 
 var typecast typecastGo.TypeCast
 
 func init() {
-	VoiceConnections = make(map[string]*VoiceConnections)
+	VoiceConnections = make(map[string]*discordgo.VoiceConnection)
 }
 
 func main() {
@@ -123,20 +123,24 @@ func queueTts(discord *discordgo.Session, message *discordgo.MessageCreate, text
 	chat.Content = text
 	chat.Save()
 
-	err = ioutil.WriteFile(fmt.Sprintf("queue/%s/%d.wav", message.GuildID, chat.ID), blob, 0707)
+	fileName := fmt.Sprintf("queue/%s/%d.wav", message.GuildID, chat.ID)
+	err = ioutil.WriteFile(fileName, blob, 0707)
 	if err != nil {
 		discord.ChannelMessageSend(message.ChannelID, "뭔가 잘못됨 2")
 		return
 	}
 
 	dgv, ok := VoiceConnections[message.GuildID]
-	if !ok || dgv.ChannelID != message.ChannelID {
-		dgv, err = discord.ChannelVoiceJoin(message.GuildID, *ChannelID, false, true)
+	if !ok || dgv.ChannelID != state.ChannelID {
+		dgv, err = discord.ChannelVoiceJoin(message.GuildID, state.ChannelID, false, true)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		VoiceConnections[message.GuildID] = dvg
+		VoiceConnections[message.GuildID] = dgv
 	}
+
+	dgvoice.PlayAudioFile(dgv, fileName, make(chan bool))
+	os.Remove(fileName)
 }
