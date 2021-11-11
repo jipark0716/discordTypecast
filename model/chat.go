@@ -1,7 +1,7 @@
 package model
 
 import (
-	// "fmt"
+	"fmt"
 	"time"
 )
 
@@ -12,6 +12,22 @@ type Chat struct {
 	ChannelID string `db:"channel_id"`
 	Content string `db:"content"`
 	CreatedAt time.Time `db:"created_at"`
+}
+
+type ChatMemberCount struct {
+	MemberID string `db:"member_id"`
+	Count int `db:"cnt"`
+}
+
+func GuildsID() (result []string, err error) {
+	err = Get(&result, "SELECT DISTINCT `guild_id` FROM `typecast_chats`")
+	return
+}
+
+func ChatCount(guildID string) (result []ChatMemberCount, err error) {
+	sql := fmt.Sprintf("SELECT COUNT(*) cnt, `member_id` FROM `typecast_chats` WHERE `guild_id` = '%s' GROUP BY `member_id` ORDER BY cnt desc", guildID)
+	err = Get(&result, sql)
+	return
 }
 
 func NewChat() Chat {

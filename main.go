@@ -4,7 +4,9 @@ import (
 	"strings"
 	"github.com/jipark0716/discordTypecast/model"
 	"fmt"
-	// "time"
+	"time"
+	"sync"
+	"unicode/utf8"
 	"os"
 	"io/ioutil"
 
@@ -20,12 +22,14 @@ const (
 	COMMENT_NOTFOUND = "지원하지 않는 명령어입니다. 도움말이 확인하려면 \"&도움\"을 입력하세요."
 )
 
-var VoiceConnections map[string]*discordgo.VoiceConnection
-
 var typecast typecastGo.TypeCast
+var voiceMutex map[string]*sync.Mutex
 
 func init() {
-	VoiceConnections = make(map[string]*discordgo.VoiceConnection)
+	voiceMutex = make(map[string]*sync.Mutex)
+	dgvoice.OnError = func(str string, err error) {
+		// println(str)
+	}
 }
 
 func main() {
@@ -54,6 +58,11 @@ func main() {
 }
 
 func onCreateMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
+	name := message.Author.Username
+	if message.Member.Nick != "" {
+		name = message.Member.Nick
+	}
+	fmt.Printf("[%s]%s/%s %s : %s\n", time.Now().Format("2006-01-02 15:04:05"), message.GuildID, message.ChannelID, name, message.Content)
 	if message.Author.ID == discord.State.User.ID {
 		return
 	}
@@ -64,6 +73,8 @@ func onCreateMessage(discord *discordgo.Session, message *discordgo.MessageCreat
 		discord.ChannelMessageSend(message.ChannelID, HELP_MAIN)
 	} else if strings.HasPrefix(message.Content, "&목소리 도움") {
 		discord.ChannelMessageSend(message.ChannelID, HELP_목소리)
+	} else if strings.HasPrefix(message.Content, "&벙어리") {
+		muteToggle(discord, message)
 	} else if strings.HasPrefix(message.Content, "&목소리") {
 		command := strings.Split(message.Content, " ")
 		if len(command) != 2 {
@@ -91,16 +102,37 @@ func settingActor(discord *discordgo.Session, message *discordgo.MessageCreate, 
 	}
 }
 
+func muteToggle(discord *discordgo.Session, message *discordgo.MessageCreate) {
+	if message.Author.ID != "429996274104926208" {
+		discord.ChannelMessageSend(message.ChannelID, "권한이 없어요.")
+		return
+	}
+	if len(message.Message.Mentions) == 0 {
+		discord.ChannelMessageSend(message.ChannelID, "맨션 하세요.")
+		return
+	}
+	setting := model.GetTypecastSetting(message.Message.Mentions[0].ID)
+	setting.IsMute = !setting.IsMute
+	setting.Save()
+
+	discord.ChannelMessageSend(message.ChannelID, "변경 완료")
+}
+
 func queueTts(discord *discordgo.Session, message *discordgo.MessageCreate, text string) {
-	if len(text) > 50 {
+	if utf8.RuneCountInString(text) > 50 {
 		discord.ChannelMessageSend(message.ChannelID, "50글자 미만으로 작성해주세요.")
 		return
 	}
 	setting := model.GetTypecastSetting(message.Author.ID)
-	if setting.ActorName == "" {
-		discord.ChannelMessageSend(message.ChannelID, "목소리 설정을 먼저 해주세요. 도움말을 확인하려면 \"$목소리 도움\"을 입력하세요.")
+	if setting.IsMute {
+		discord.ChannelMessageSend(message.ChannelID, "당신은 벙어리 입니다.")
 		return
 	}
+	if setting.ActorName == "" {
+		discord.ChannelMessageSend(message.ChannelID, "목소리 설정을 먼저 해주세요. 도움말을 확인하려면 \"&목소리 도움\"을 입력하세요.")
+		return
+	}
+
 
 	state, err := discord.State.VoiceState(message.GuildID, message.Author.ID)
 
@@ -130,17 +162,21 @@ func queueTts(discord *discordgo.Session, message *discordgo.MessageCreate, text
 		return
 	}
 
-	dgv, ok := VoiceConnections[message.GuildID]
-	if !ok || dgv.ChannelID != state.ChannelID {
-		dgv, err = discord.ChannelVoiceJoin(message.GuildID, state.ChannelID, false, true)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	mute, ok := voiceMutex[message.GuildID]
+	if !ok {
+		mute = &sync.Mutex{}
+		voiceMutex[message.GuildID] = mute
+	}
+	mute.Lock()
 
-		VoiceConnections[message.GuildID] = dgv
+	dgv, err := discord.ChannelVoiceJoin(message.GuildID, state.ChannelID, false, true)
+	if err != nil {
+		discord.ChannelMessageSend(message.ChannelID, "뭔가 잘못됨 3")
+		return
 	}
 
 	dgvoice.PlayAudioFile(dgv, fileName, make(chan bool))
 	os.Remove(fileName)
+
+	mute.Unlock()
 }

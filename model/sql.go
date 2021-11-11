@@ -28,6 +28,14 @@ type Example struct {
 
 var DB map[string]*sqlx.DB
 
+func BooltoInt(b bool) string {
+    if b {
+        return "1"
+    } else {
+        return "0"
+    }
+}
+
 /*
  * DB 연결
  *
