@@ -34,7 +34,7 @@ func init() {
 
 func main() {
 	var err error
-	typecast, err = typecastGo.NewTypeCast("jipark0716@gmail.com", "h4CZ2gDgHrydinP")
+	typecast, err = typecastGo.NewTypeCast(os.Getenv("TYPECAST_ID"), os.Getenv("TYPECAST_pw"))
 	if err != nil {
 		fmt.Printf("%#v\n", err)
 		return
