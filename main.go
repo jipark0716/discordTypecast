@@ -23,15 +23,32 @@ const (
 	COMMENT_NOTFOUND = "지원하지 않는 명령어입니다. 도움말이 확인하려면 \"&도움\"을 입력하세요."
 )
 
+type IdleVoiceConnect struct {
+	VoiceConnection *discordgo.VoiceConnection
+	LastUse time.Time
+}
+
 var typecast typecastGo.TypeCast
 var voiceMutex map[string]*sync.Mutex
+var IdleVoiceConnects map[string]IdleVoiceConnect
+var IdleMutex *sync.Mutex
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 	voiceMutex = make(map[string]*sync.Mutex)
+	IdleVoiceConnects = make(map[string]IdleVoiceConnect)
+	IdleMutex = &sync.Mutex{}
 	dgvoice.OnError = func(str string, err error) {
-		// println(str)
+		if str != "PCM Channel closed" {
+			println(str)
+		}
 	}
+	go func () {
+		for {
+			time.Sleep(10 * time.Second)
+			go disconnectIdleVoiceConnect()
+		}
+	}()
 }
 
 func main() {
@@ -140,11 +157,9 @@ func roulette(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 	discord.ChannelMessageSend(message.ChannelID, prevMessage)
 
-	rand.Shuffle(len(members), func(i int, j int) {
-		members[i], members[j] = members[j], members[i]
-	})
+	discord.ChannelMessageSend(message.ChannelID, "당첨 : "+members[rand.Intn(len(members))].Mention())
 
-	discord.ChannelMessageSend(message.ChannelID, "당첨 : "+members[0].Mention())
+	model.CreateRouletteHistory(members, members[0].User.ID, message.GuildID)
 }
 
 func muteToggle(discord *discordgo.Session, message *discordgo.MessageCreate) {
@@ -214,14 +229,35 @@ func queueTts(discord *discordgo.Session, message *discordgo.MessageCreate, text
 	}
 	mute.Lock()
 
-	dgv, err := discord.ChannelVoiceJoin(message.GuildID, state.ChannelID, false, true)
-	if err != nil {
-		discord.ChannelMessageSend(message.ChannelID, "뭔가 잘못됨 3")
-		return
+	var dgv *discordgo.VoiceConnection
+	if dgv, ok = discord.VoiceConnections[message.GuildID]; ok {
+		dgv.ChangeChannel(state.ChannelID, false, true)
+	} else {
+		dgv, err = discord.ChannelVoiceJoin(message.GuildID, state.ChannelID, false, true)
+		if err != nil {
+			discord.ChannelMessageSend(message.ChannelID, "뭔가 잘못됨 3")
+			return
+		}
 	}
 
 	dgvoice.PlayAudioFile(dgv, fileName, make(chan bool))
 	os.Remove(fileName)
 
 	mute.Unlock()
+
+	IdleVoiceConnects[message.GuildID] = IdleVoiceConnect{
+		VoiceConnection: dgv,
+		LastUse: time.Now(),
+	}
+}
+
+func disconnectIdleVoiceConnect() {
+	for guildId, connection := range IdleVoiceConnects {
+		fmt.Printf("%#v\n", connection.LastUse.Format("2006-01-02 15:04:05"))
+		fmt.Printf("%#v\n", time.Now().Add(time.Second * 300).Format("2006-01-02 15:04:05"))
+		if connection.LastUse.After(time.Now().Add(time.Second * 300)) {
+			delete(IdleVoiceConnects, guildId)
+			connection.VoiceConnection.Disconnect()
+		}
+	}
 }
