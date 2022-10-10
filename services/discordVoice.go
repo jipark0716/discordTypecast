@@ -29,7 +29,7 @@ func (d *Discord) OnClickVoiceListPaginateButton(event *discordgo.InteractionCre
 
 func (d *Discord) ReplyActorList(interaction *discordgo.Interaction, page int) {
 	pageLength := 25
-	actors, err := GetTypecastInstance().GetActors()
+	actors, err := d.Typecast.GetActors()
 	if err != nil {
 		report(err)
 		return

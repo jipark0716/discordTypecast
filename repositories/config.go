@@ -1,4 +1,4 @@
-package services
+package repositories
 
 import (
 	"encoding/json"
@@ -9,27 +9,27 @@ import (
 	"github.com/aws/aws-sdk-go/service/ssm"
 )
 
-type configService struct {
+type ConfigService struct {
 	params map[string]interface{}
 }
 
-var configInstance *configService
+var configInstnace *ConfigService
 
 // return config service singleton instance
-func GetConfigInstance() *configService {
-	if configInstance == nil {
-		configInstance = new(configService)
-		configInstance.init()
+func GetConfigInstnace() *ConfigService {
+	if configInstnace == nil {
+		config := new(ConfigService)
+		config.init()
+		configInstnace = config
 	}
-
-	return configInstance
+	return configInstnace
 }
 
-func (cs *configService) Get(key string) interface{} {
+func (cs *ConfigService) Get(key string) interface{} {
 	return cs.params[key]
 }
 
-func (cs *configService) init() {
+func (cs *ConfigService) init() {
 	sess, err := session.NewSessionWithOptions(session.Options{
 		Config:            aws.Config{Region: aws.String("ap-northeast-2")},
 		SharedConfigState: session.SharedConfigEnable,

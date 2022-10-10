@@ -1,51 +1,47 @@
 package services
 
 import (
-	"log"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/jipark0716/discordTypecast/repositories"
 )
 
 type Discord struct {
 	*discordgo.Session
+	Typecast      repositories.Typecast
+	ApplicationId string
 }
 
-var discordInstance *Discord
+func NewDiscord(typecast repositories.Typecast) (discord Discord, err error) {
+	discord = Discord{}
 
-func GetDiscordInstance() *Discord {
+	discord.Typecast = typecast
 
-	if discordInstance == nil {
-		var err error
-		config := GetConfigInstance()
-		discordInstance = new(Discord)
-		discordInstance.Session, err = discordgo.New(config.Get("DISCORD_TOKEN").(string))
+	discord.ApplicationId = repositories.
+		GetConfigInstnace().
+		Get("DISCORD_ID").(string)
 
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	discord.Session, err = discordgo.New(
+		repositories.
+			GetConfigInstnace().
+			Get("DISCORD_TOKEN").(string),
+	)
 
-	return discordInstance
-}
-
-func (d *Discord) Start() (err error) {
-	err = d.Open()
-	// d.AddHandler()
-	return err
+	return
 }
 
 func (d *Discord) ApplicationCommands() ([]*discordgo.ApplicationCommand, error) {
 	return d.Session.ApplicationCommands(
-		GetConfigInstance().Get("DISCORD_ID").(string),
+		d.ApplicationId,
 		"",
 	)
 }
 
 func (d *Discord) ApplicationCommandCreate(cmd *discordgo.ApplicationCommand) (*discordgo.ApplicationCommand, error) {
-	cmd.ApplicationID = GetConfigInstance().Get("DISCORD_ID").(string)
+	cmd.ApplicationID = d.ApplicationId
 	return d.Session.ApplicationCommandCreate(
-		GetConfigInstance().Get("DISCORD_ID").(string),
+		d.ApplicationId,
 		"",
 		cmd,
 	)
@@ -66,7 +62,7 @@ func (d *Discord) CreateChangeVoiceCommand() (*discordgo.ApplicationCommand, err
 
 func (d *Discord) Serve() (err error) {
 	d.AddHandler(d.OnInteractionCreate)
-	d.Start()
+	d.Open()
 	return
 }
 
