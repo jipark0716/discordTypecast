@@ -90,6 +90,8 @@ func (d *Discord) OnInteractionApplicationCommand(event *discordgo.InteractionCr
 func (d *Discord) OnInteractionMessageComponent(event *discordgo.InteractionCreate) {
 	switch CustomID := event.MessageComponentData().CustomID; {
 	case strings.HasPrefix(CustomID, VoiceActorsListPage):
-		d.ReplyActorList(event.Interaction, 2)
+		d.OnClickVoiceListPaginateButton(event)
+	case CustomID == VoiceActorSelect:
+		d.OnVoiceActorSlect(event)
 	}
 }
