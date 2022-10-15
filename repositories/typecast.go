@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/jipark0716/discordTypecast/config"
 	"github.com/jipark0716/typecastgo"
 )
 
@@ -12,8 +13,8 @@ type Typecast struct {
 func NewTypecast() (typecast Typecast) {
 	typecast.Session = typecastgo.NewSession()
 	typecast.Connect(&typecastgo.LoginRequest{
-		Email:             GetConfigInstnace().Get("TYPECAST_EMAIL").(string),
-		Password:          GetConfigInstnace().Get("TYPECAST_PASSWORD").(string),
+		Email:             config.Get("TYPECAST_EMAIL").(string),
+		Password:          config.Get("TYPECAST_PASSWORD").(string),
 		ReturnSecureToken: true,
 	})
 	return

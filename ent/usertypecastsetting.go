@@ -15,10 +15,10 @@ type UserTypecastSetting struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID string `json:"user_id,omitempty"`
 	// ActorID holds the value of the "actor_id" field.
 	ActorID string `json:"actor_id,omitempty"`
-	// Text holds the value of the "text" field.
-	Text string `json:"text,omitempty"`
 	// Lang holds the value of the "lang" field.
 	Lang string `json:"lang,omitempty"`
 	// MaxSeconds holds the value of the "max_seconds" field.
@@ -34,7 +34,7 @@ type UserTypecastSetting struct {
 	// LastPitch holds the value of the "last_pitch" field.
 	LastPitch *string `json:"last_pitch,omitempty"`
 	// Mode holds the value of the "mode" field.
-	Mode string `json:"mode,omitempty"`
+	Mode *string `json:"mode,omitempty"`
 	// Pitch holds the value of the "pitch" field.
 	Pitch int `json:"pitch,omitempty"`
 	// StyleLabel holds the value of the "style_label" field.
@@ -54,7 +54,7 @@ func (*UserTypecastSetting) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case usertypecastsetting.FieldID, usertypecastsetting.FieldMaxSeconds, usertypecastsetting.FieldSpeedX, usertypecastsetting.FieldStyleIdx, usertypecastsetting.FieldPitch, usertypecastsetting.FieldTempo:
 			values[i] = new(sql.NullInt64)
-		case usertypecastsetting.FieldActorID, usertypecastsetting.FieldText, usertypecastsetting.FieldLang, usertypecastsetting.FieldGid, usertypecastsetting.FieldLastPitch, usertypecastsetting.FieldMode, usertypecastsetting.FieldStyleLabel, usertypecastsetting.FieldStyleLabelVersion:
+		case usertypecastsetting.FieldUserID, usertypecastsetting.FieldActorID, usertypecastsetting.FieldLang, usertypecastsetting.FieldGid, usertypecastsetting.FieldLastPitch, usertypecastsetting.FieldMode, usertypecastsetting.FieldStyleLabel, usertypecastsetting.FieldStyleLabelVersion:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type UserTypecastSetting", columns[i])
@@ -77,17 +77,17 @@ func (uts *UserTypecastSetting) assignValues(columns []string, values []any) err
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			uts.ID = int(value.Int64)
+		case usertypecastsetting.FieldUserID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value.Valid {
+				uts.UserID = value.String
+			}
 		case usertypecastsetting.FieldActorID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field actor_id", values[i])
 			} else if value.Valid {
 				uts.ActorID = value.String
-			}
-		case usertypecastsetting.FieldText:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field text", values[i])
-			} else if value.Valid {
-				uts.Text = value.String
 			}
 		case usertypecastsetting.FieldLang:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -136,7 +136,8 @@ func (uts *UserTypecastSetting) assignValues(columns []string, values []any) err
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field mode", values[i])
 			} else if value.Valid {
-				uts.Mode = value.String
+				uts.Mode = new(string)
+				*uts.Mode = value.String
 			}
 		case usertypecastsetting.FieldPitch:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -190,11 +191,11 @@ func (uts *UserTypecastSetting) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserTypecastSetting(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", uts.ID))
+	builder.WriteString("user_id=")
+	builder.WriteString(uts.UserID)
+	builder.WriteString(", ")
 	builder.WriteString("actor_id=")
 	builder.WriteString(uts.ActorID)
-	builder.WriteString(", ")
-	builder.WriteString("text=")
-	builder.WriteString(uts.Text)
 	builder.WriteString(", ")
 	builder.WriteString("lang=")
 	builder.WriteString(uts.Lang)
@@ -219,8 +220,10 @@ func (uts *UserTypecastSetting) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("mode=")
-	builder.WriteString(uts.Mode)
+	if v := uts.Mode; v != nil {
+		builder.WriteString("mode=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("pitch=")
 	builder.WriteString(fmt.Sprintf("%v", uts.Pitch))

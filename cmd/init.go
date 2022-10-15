@@ -5,6 +5,10 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/jipark0716/discordTypecast/database"
+	"github.com/jipark0716/discordTypecast/wire"
 	"github.com/spf13/cobra"
 )
 
@@ -14,13 +18,18 @@ var initCmd = &cobra.Command{
 	Short: "init service",
 	Long:  "init service",
 	Run: func(cmd *cobra.Command, args []string) {
-		// command, err := services.GetDiscordInstance().CreateChangeVoiceCommand()
-		// if err != nil {
-		// 	println("fail")
-		// 	fmt.Printf("%+v\n", err)
-		// 	return
-		// }
-		// fmt.Printf("%#v\n", command)
+		discord, err := wire.NewDiscordService()
+		command, err := discord.CreateChangeVoiceCommand()
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+			return
+		}
+		fmt.Printf("%#v\n", command)
+		err = database.Migrate()
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+			return
+		}
 	},
 }
 

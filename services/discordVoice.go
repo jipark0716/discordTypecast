@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/jipark0716/discordTypecast/handler"
 )
 
 const (
@@ -22,7 +23,7 @@ func (d *Discord) OnExecuteVoiceCommand(event *discordgo.InteractionCreate) {
 func (d *Discord) OnClickVoiceListPaginateButton(event *discordgo.InteractionCreate) {
 	page, err := strconv.Atoi(strings.Replace(event.MessageComponentData().CustomID, VoiceActorsListPage, "", 1))
 	if err != nil {
-		report(err)
+		handler.Report(err)
 	}
 	d.ReplyActorList(event.Interaction, page)
 }
@@ -31,7 +32,7 @@ func (d *Discord) ReplyActorList(interaction *discordgo.Interaction, page int) {
 	pageLength := 25
 	actors, err := d.Typecast.GetActors()
 	if err != nil {
-		report(err)
+		handler.Report(err)
 		return
 	}
 
@@ -75,7 +76,7 @@ func (d *Discord) ReplyActorList(interaction *discordgo.Interaction, page int) {
 	)
 
 	if err != nil {
-		report(err)
+		handler.Report(err)
 	}
 }
 
@@ -101,8 +102,23 @@ func (d *Discord) GetPaginateButton(page int, lastpage int, idPrefix string) (ac
 func (d *Discord) OnVoiceActorSlect(event *discordgo.InteractionCreate) {
 	values := event.Interaction.MessageComponentData().Values
 	if len(values) < 1 {
-		report(fmt.Errorf("not enough values actor select"))
+		handler.Report(fmt.Errorf("not enough values actor select"))
 		return
 	}
-	// d.SaveActor(event.Member.User.ID, values[0])
+
+	err := d.UserRepository.SaveActor(event.Member.User.ID, values[0])
+	if err != nil {
+		handler.Report(err)
+	}
+
+	err = d.InteractionRespond(
+		event.Interaction,
+		&discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseDeferredMessageUpdate,
+		},
+	)
+
+	if err != nil {
+		handler.Report(err)
+	}
 }

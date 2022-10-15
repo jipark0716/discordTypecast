@@ -7,10 +7,10 @@ const (
 	Label = "user_typecast_setting"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
 	// FieldActorID holds the string denoting the actor_id field in the database.
 	FieldActorID = "actor_id"
-	// FieldText holds the string denoting the text field in the database.
-	FieldText = "text"
 	// FieldLang holds the string denoting the lang field in the database.
 	FieldLang = "lang"
 	// FieldMaxSeconds holds the string denoting the max_seconds field in the database.
@@ -42,8 +42,8 @@ const (
 // Columns holds all SQL columns for usertypecastsetting fields.
 var Columns = []string{
 	FieldID,
+	FieldUserID,
 	FieldActorID,
-	FieldText,
 	FieldLang,
 	FieldMaxSeconds,
 	FieldNaturalness,
@@ -75,6 +75,8 @@ var (
 	DefaultMaxSeconds int
 	// DefaultNaturalness holds the default value on creation for the "naturalness" field.
 	DefaultNaturalness float64
+	// DefaultSpeedX holds the default value on creation for the "speed_x" field.
+	DefaultSpeedX int
 	// DefaultGid holds the default value on creation for the "gid" field.
 	DefaultGid string
 	// DefaultStyleIdx holds the default value on creation for the "style_idx" field.

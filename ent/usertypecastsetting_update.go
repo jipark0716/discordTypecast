@@ -27,15 +27,15 @@ func (utsu *UserTypecastSettingUpdate) Where(ps ...predicate.UserTypecastSetting
 	return utsu
 }
 
-// SetActorID sets the "actor_id" field.
-func (utsu *UserTypecastSettingUpdate) SetActorID(s string) *UserTypecastSettingUpdate {
-	utsu.mutation.SetActorID(s)
+// SetUserID sets the "user_id" field.
+func (utsu *UserTypecastSettingUpdate) SetUserID(s string) *UserTypecastSettingUpdate {
+	utsu.mutation.SetUserID(s)
 	return utsu
 }
 
-// SetText sets the "text" field.
-func (utsu *UserTypecastSettingUpdate) SetText(s string) *UserTypecastSettingUpdate {
-	utsu.mutation.SetText(s)
+// SetActorID sets the "actor_id" field.
+func (utsu *UserTypecastSettingUpdate) SetActorID(s string) *UserTypecastSettingUpdate {
+	utsu.mutation.SetActorID(s)
 	return utsu
 }
 
@@ -102,6 +102,14 @@ func (utsu *UserTypecastSettingUpdate) SetSpeedX(i int) *UserTypecastSettingUpda
 	return utsu
 }
 
+// SetNillableSpeedX sets the "speed_x" field if the given value is not nil.
+func (utsu *UserTypecastSettingUpdate) SetNillableSpeedX(i *int) *UserTypecastSettingUpdate {
+	if i != nil {
+		utsu.SetSpeedX(*i)
+	}
+	return utsu
+}
+
 // AddSpeedX adds i to the "speed_x" field.
 func (utsu *UserTypecastSettingUpdate) AddSpeedX(i int) *UserTypecastSettingUpdate {
 	utsu.mutation.AddSpeedX(i)
@@ -149,9 +157,37 @@ func (utsu *UserTypecastSettingUpdate) SetLastPitch(s string) *UserTypecastSetti
 	return utsu
 }
 
+// SetNillableLastPitch sets the "last_pitch" field if the given value is not nil.
+func (utsu *UserTypecastSettingUpdate) SetNillableLastPitch(s *string) *UserTypecastSettingUpdate {
+	if s != nil {
+		utsu.SetLastPitch(*s)
+	}
+	return utsu
+}
+
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (utsu *UserTypecastSettingUpdate) ClearLastPitch() *UserTypecastSettingUpdate {
+	utsu.mutation.ClearLastPitch()
+	return utsu
+}
+
 // SetMode sets the "mode" field.
 func (utsu *UserTypecastSettingUpdate) SetMode(s string) *UserTypecastSettingUpdate {
 	utsu.mutation.SetMode(s)
+	return utsu
+}
+
+// SetNillableMode sets the "mode" field if the given value is not nil.
+func (utsu *UserTypecastSettingUpdate) SetNillableMode(s *string) *UserTypecastSettingUpdate {
+	if s != nil {
+		utsu.SetMode(*s)
+	}
+	return utsu
+}
+
+// ClearMode clears the value of the "mode" field.
+func (utsu *UserTypecastSettingUpdate) ClearMode() *UserTypecastSettingUpdate {
+	utsu.mutation.ClearMode()
 	return utsu
 }
 
@@ -302,18 +338,18 @@ func (utsu *UserTypecastSettingUpdate) sqlSave(ctx context.Context) (n int, err 
 			}
 		}
 	}
+	if value, ok := utsu.mutation.UserID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: usertypecastsetting.FieldUserID,
+		})
+	}
 	if value, ok := utsu.mutation.ActorID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: usertypecastsetting.FieldActorID,
-		})
-	}
-	if value, ok := utsu.mutation.Text(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: usertypecastsetting.FieldText,
 		})
 	}
 	if value, ok := utsu.mutation.Lang(); ok {
@@ -393,10 +429,22 @@ func (utsu *UserTypecastSettingUpdate) sqlSave(ctx context.Context) (n int, err 
 			Column: usertypecastsetting.FieldLastPitch,
 		})
 	}
+	if utsu.mutation.LastPitchCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: usertypecastsetting.FieldLastPitch,
+		})
+	}
 	if value, ok := utsu.mutation.Mode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
+			Column: usertypecastsetting.FieldMode,
+		})
+	}
+	if utsu.mutation.ModeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
 			Column: usertypecastsetting.FieldMode,
 		})
 	}
@@ -461,15 +509,15 @@ type UserTypecastSettingUpdateOne struct {
 	mutation *UserTypecastSettingMutation
 }
 
-// SetActorID sets the "actor_id" field.
-func (utsuo *UserTypecastSettingUpdateOne) SetActorID(s string) *UserTypecastSettingUpdateOne {
-	utsuo.mutation.SetActorID(s)
+// SetUserID sets the "user_id" field.
+func (utsuo *UserTypecastSettingUpdateOne) SetUserID(s string) *UserTypecastSettingUpdateOne {
+	utsuo.mutation.SetUserID(s)
 	return utsuo
 }
 
-// SetText sets the "text" field.
-func (utsuo *UserTypecastSettingUpdateOne) SetText(s string) *UserTypecastSettingUpdateOne {
-	utsuo.mutation.SetText(s)
+// SetActorID sets the "actor_id" field.
+func (utsuo *UserTypecastSettingUpdateOne) SetActorID(s string) *UserTypecastSettingUpdateOne {
+	utsuo.mutation.SetActorID(s)
 	return utsuo
 }
 
@@ -536,6 +584,14 @@ func (utsuo *UserTypecastSettingUpdateOne) SetSpeedX(i int) *UserTypecastSetting
 	return utsuo
 }
 
+// SetNillableSpeedX sets the "speed_x" field if the given value is not nil.
+func (utsuo *UserTypecastSettingUpdateOne) SetNillableSpeedX(i *int) *UserTypecastSettingUpdateOne {
+	if i != nil {
+		utsuo.SetSpeedX(*i)
+	}
+	return utsuo
+}
+
 // AddSpeedX adds i to the "speed_x" field.
 func (utsuo *UserTypecastSettingUpdateOne) AddSpeedX(i int) *UserTypecastSettingUpdateOne {
 	utsuo.mutation.AddSpeedX(i)
@@ -583,9 +639,37 @@ func (utsuo *UserTypecastSettingUpdateOne) SetLastPitch(s string) *UserTypecastS
 	return utsuo
 }
 
+// SetNillableLastPitch sets the "last_pitch" field if the given value is not nil.
+func (utsuo *UserTypecastSettingUpdateOne) SetNillableLastPitch(s *string) *UserTypecastSettingUpdateOne {
+	if s != nil {
+		utsuo.SetLastPitch(*s)
+	}
+	return utsuo
+}
+
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (utsuo *UserTypecastSettingUpdateOne) ClearLastPitch() *UserTypecastSettingUpdateOne {
+	utsuo.mutation.ClearLastPitch()
+	return utsuo
+}
+
 // SetMode sets the "mode" field.
 func (utsuo *UserTypecastSettingUpdateOne) SetMode(s string) *UserTypecastSettingUpdateOne {
 	utsuo.mutation.SetMode(s)
+	return utsuo
+}
+
+// SetNillableMode sets the "mode" field if the given value is not nil.
+func (utsuo *UserTypecastSettingUpdateOne) SetNillableMode(s *string) *UserTypecastSettingUpdateOne {
+	if s != nil {
+		utsuo.SetMode(*s)
+	}
+	return utsuo
+}
+
+// ClearMode clears the value of the "mode" field.
+func (utsuo *UserTypecastSettingUpdateOne) ClearMode() *UserTypecastSettingUpdateOne {
+	utsuo.mutation.ClearMode()
 	return utsuo
 }
 
@@ -766,18 +850,18 @@ func (utsuo *UserTypecastSettingUpdateOne) sqlSave(ctx context.Context) (_node *
 			}
 		}
 	}
+	if value, ok := utsuo.mutation.UserID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: usertypecastsetting.FieldUserID,
+		})
+	}
 	if value, ok := utsuo.mutation.ActorID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: usertypecastsetting.FieldActorID,
-		})
-	}
-	if value, ok := utsuo.mutation.Text(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: usertypecastsetting.FieldText,
 		})
 	}
 	if value, ok := utsuo.mutation.Lang(); ok {
@@ -857,10 +941,22 @@ func (utsuo *UserTypecastSettingUpdateOne) sqlSave(ctx context.Context) (_node *
 			Column: usertypecastsetting.FieldLastPitch,
 		})
 	}
+	if utsuo.mutation.LastPitchCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: usertypecastsetting.FieldLastPitch,
+		})
+	}
 	if value, ok := utsuo.mutation.Mode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
+			Column: usertypecastsetting.FieldMode,
+		})
+	}
+	if utsuo.mutation.ModeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
 			Column: usertypecastsetting.FieldMode,
 		})
 	}

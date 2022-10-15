@@ -253,12 +253,12 @@ func (utsq *UserTypecastSettingQuery) Clone() *UserTypecastSettingQuery {
 // Example:
 //
 //	var v []struct {
-//		ActorID string `json:"actor_id,omitempty"`
+//		UserID string `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.UserTypecastSetting.Query().
-//		GroupBy(usertypecastsetting.FieldActorID).
+//		GroupBy(usertypecastsetting.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (utsq *UserTypecastSettingQuery) GroupBy(field string, fields ...string) *UserTypecastSettingGroupBy {
@@ -281,11 +281,11 @@ func (utsq *UserTypecastSettingQuery) GroupBy(field string, fields ...string) *U
 // Example:
 //
 //	var v []struct {
-//		ActorID string `json:"actor_id,omitempty"`
+//		UserID string `json:"user_id,omitempty"`
 //	}
 //
 //	client.UserTypecastSetting.Query().
-//		Select(usertypecastsetting.FieldActorID).
+//		Select(usertypecastsetting.FieldUserID).
 //		Scan(ctx, &v)
 func (utsq *UserTypecastSettingQuery) Select(fields ...string) *UserTypecastSettingSelect {
 	utsq.fields = append(utsq.fields, fields...)

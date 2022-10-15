@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/jipark0716/discordTypecast/ent/usertypecastsetting"
@@ -17,17 +18,18 @@ type UserTypecastSettingCreate struct {
 	config
 	mutation *UserTypecastSettingMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
+}
+
+// SetUserID sets the "user_id" field.
+func (utsc *UserTypecastSettingCreate) SetUserID(s string) *UserTypecastSettingCreate {
+	utsc.mutation.SetUserID(s)
+	return utsc
 }
 
 // SetActorID sets the "actor_id" field.
 func (utsc *UserTypecastSettingCreate) SetActorID(s string) *UserTypecastSettingCreate {
 	utsc.mutation.SetActorID(s)
-	return utsc
-}
-
-// SetText sets the "text" field.
-func (utsc *UserTypecastSettingCreate) SetText(s string) *UserTypecastSettingCreate {
-	utsc.mutation.SetText(s)
 	return utsc
 }
 
@@ -79,6 +81,14 @@ func (utsc *UserTypecastSettingCreate) SetSpeedX(i int) *UserTypecastSettingCrea
 	return utsc
 }
 
+// SetNillableSpeedX sets the "speed_x" field if the given value is not nil.
+func (utsc *UserTypecastSettingCreate) SetNillableSpeedX(i *int) *UserTypecastSettingCreate {
+	if i != nil {
+		utsc.SetSpeedX(*i)
+	}
+	return utsc
+}
+
 // SetGid sets the "gid" field.
 func (utsc *UserTypecastSettingCreate) SetGid(s string) *UserTypecastSettingCreate {
 	utsc.mutation.SetGid(s)
@@ -113,9 +123,25 @@ func (utsc *UserTypecastSettingCreate) SetLastPitch(s string) *UserTypecastSetti
 	return utsc
 }
 
+// SetNillableLastPitch sets the "last_pitch" field if the given value is not nil.
+func (utsc *UserTypecastSettingCreate) SetNillableLastPitch(s *string) *UserTypecastSettingCreate {
+	if s != nil {
+		utsc.SetLastPitch(*s)
+	}
+	return utsc
+}
+
 // SetMode sets the "mode" field.
 func (utsc *UserTypecastSettingCreate) SetMode(s string) *UserTypecastSettingCreate {
 	utsc.mutation.SetMode(s)
+	return utsc
+}
+
+// SetNillableMode sets the "mode" field if the given value is not nil.
+func (utsc *UserTypecastSettingCreate) SetNillableMode(s *string) *UserTypecastSettingCreate {
+	if s != nil {
+		utsc.SetMode(*s)
+	}
 	return utsc
 }
 
@@ -264,6 +290,10 @@ func (utsc *UserTypecastSettingCreate) defaults() {
 		v := usertypecastsetting.DefaultNaturalness
 		utsc.mutation.SetNaturalness(v)
 	}
+	if _, ok := utsc.mutation.SpeedX(); !ok {
+		v := usertypecastsetting.DefaultSpeedX
+		utsc.mutation.SetSpeedX(v)
+	}
 	if _, ok := utsc.mutation.Gid(); !ok {
 		v := usertypecastsetting.DefaultGid
 		utsc.mutation.SetGid(v)
@@ -292,11 +322,11 @@ func (utsc *UserTypecastSettingCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (utsc *UserTypecastSettingCreate) check() error {
+	if _, ok := utsc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "UserTypecastSetting.user_id"`)}
+	}
 	if _, ok := utsc.mutation.ActorID(); !ok {
 		return &ValidationError{Name: "actor_id", err: errors.New(`ent: missing required field "UserTypecastSetting.actor_id"`)}
-	}
-	if _, ok := utsc.mutation.Text(); !ok {
-		return &ValidationError{Name: "text", err: errors.New(`ent: missing required field "UserTypecastSetting.text"`)}
 	}
 	if _, ok := utsc.mutation.Lang(); !ok {
 		return &ValidationError{Name: "lang", err: errors.New(`ent: missing required field "UserTypecastSetting.lang"`)}
@@ -315,12 +345,6 @@ func (utsc *UserTypecastSettingCreate) check() error {
 	}
 	if _, ok := utsc.mutation.StyleIdx(); !ok {
 		return &ValidationError{Name: "style_idx", err: errors.New(`ent: missing required field "UserTypecastSetting.style_idx"`)}
-	}
-	if _, ok := utsc.mutation.LastPitch(); !ok {
-		return &ValidationError{Name: "last_pitch", err: errors.New(`ent: missing required field "UserTypecastSetting.last_pitch"`)}
-	}
-	if _, ok := utsc.mutation.Mode(); !ok {
-		return &ValidationError{Name: "mode", err: errors.New(`ent: missing required field "UserTypecastSetting.mode"`)}
 	}
 	if _, ok := utsc.mutation.Pitch(); !ok {
 		return &ValidationError{Name: "pitch", err: errors.New(`ent: missing required field "UserTypecastSetting.pitch"`)}
@@ -361,6 +385,15 @@ func (utsc *UserTypecastSettingCreate) createSpec() (*UserTypecastSetting, *sqlg
 			},
 		}
 	)
+	_spec.OnConflict = utsc.conflict
+	if value, ok := utsc.mutation.UserID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: usertypecastsetting.FieldUserID,
+		})
+		_node.UserID = value
+	}
 	if value, ok := utsc.mutation.ActorID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -368,14 +401,6 @@ func (utsc *UserTypecastSettingCreate) createSpec() (*UserTypecastSetting, *sqlg
 			Column: usertypecastsetting.FieldActorID,
 		})
 		_node.ActorID = value
-	}
-	if value, ok := utsc.mutation.Text(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: usertypecastsetting.FieldText,
-		})
-		_node.Text = value
 	}
 	if value, ok := utsc.mutation.Lang(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -439,7 +464,7 @@ func (utsc *UserTypecastSettingCreate) createSpec() (*UserTypecastSetting, *sqlg
 			Value:  value,
 			Column: usertypecastsetting.FieldMode,
 		})
-		_node.Mode = value
+		_node.Mode = &value
 	}
 	if value, ok := utsc.mutation.Pitch(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -476,10 +501,601 @@ func (utsc *UserTypecastSettingCreate) createSpec() (*UserTypecastSetting, *sqlg
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.UserTypecastSetting.Create().
+//		SetUserID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.UserTypecastSettingUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (utsc *UserTypecastSettingCreate) OnConflict(opts ...sql.ConflictOption) *UserTypecastSettingUpsertOne {
+	utsc.conflict = opts
+	return &UserTypecastSettingUpsertOne{
+		create: utsc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.UserTypecastSetting.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (utsc *UserTypecastSettingCreate) OnConflictColumns(columns ...string) *UserTypecastSettingUpsertOne {
+	utsc.conflict = append(utsc.conflict, sql.ConflictColumns(columns...))
+	return &UserTypecastSettingUpsertOne{
+		create: utsc,
+	}
+}
+
+type (
+	// UserTypecastSettingUpsertOne is the builder for "upsert"-ing
+	//  one UserTypecastSetting node.
+	UserTypecastSettingUpsertOne struct {
+		create *UserTypecastSettingCreate
+	}
+
+	// UserTypecastSettingUpsert is the "OnConflict" setter.
+	UserTypecastSettingUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUserID sets the "user_id" field.
+func (u *UserTypecastSettingUpsert) SetUserID(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateUserID() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldUserID)
+	return u
+}
+
+// SetActorID sets the "actor_id" field.
+func (u *UserTypecastSettingUpsert) SetActorID(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldActorID, v)
+	return u
+}
+
+// UpdateActorID sets the "actor_id" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateActorID() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldActorID)
+	return u
+}
+
+// SetLang sets the "lang" field.
+func (u *UserTypecastSettingUpsert) SetLang(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldLang, v)
+	return u
+}
+
+// UpdateLang sets the "lang" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateLang() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldLang)
+	return u
+}
+
+// SetMaxSeconds sets the "max_seconds" field.
+func (u *UserTypecastSettingUpsert) SetMaxSeconds(v int) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldMaxSeconds, v)
+	return u
+}
+
+// UpdateMaxSeconds sets the "max_seconds" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateMaxSeconds() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldMaxSeconds)
+	return u
+}
+
+// AddMaxSeconds adds v to the "max_seconds" field.
+func (u *UserTypecastSettingUpsert) AddMaxSeconds(v int) *UserTypecastSettingUpsert {
+	u.Add(usertypecastsetting.FieldMaxSeconds, v)
+	return u
+}
+
+// SetNaturalness sets the "naturalness" field.
+func (u *UserTypecastSettingUpsert) SetNaturalness(v float64) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldNaturalness, v)
+	return u
+}
+
+// UpdateNaturalness sets the "naturalness" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateNaturalness() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldNaturalness)
+	return u
+}
+
+// AddNaturalness adds v to the "naturalness" field.
+func (u *UserTypecastSettingUpsert) AddNaturalness(v float64) *UserTypecastSettingUpsert {
+	u.Add(usertypecastsetting.FieldNaturalness, v)
+	return u
+}
+
+// SetSpeedX sets the "speed_x" field.
+func (u *UserTypecastSettingUpsert) SetSpeedX(v int) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldSpeedX, v)
+	return u
+}
+
+// UpdateSpeedX sets the "speed_x" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateSpeedX() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldSpeedX)
+	return u
+}
+
+// AddSpeedX adds v to the "speed_x" field.
+func (u *UserTypecastSettingUpsert) AddSpeedX(v int) *UserTypecastSettingUpsert {
+	u.Add(usertypecastsetting.FieldSpeedX, v)
+	return u
+}
+
+// SetGid sets the "gid" field.
+func (u *UserTypecastSettingUpsert) SetGid(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldGid, v)
+	return u
+}
+
+// UpdateGid sets the "gid" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateGid() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldGid)
+	return u
+}
+
+// SetStyleIdx sets the "style_idx" field.
+func (u *UserTypecastSettingUpsert) SetStyleIdx(v int) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldStyleIdx, v)
+	return u
+}
+
+// UpdateStyleIdx sets the "style_idx" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateStyleIdx() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldStyleIdx)
+	return u
+}
+
+// AddStyleIdx adds v to the "style_idx" field.
+func (u *UserTypecastSettingUpsert) AddStyleIdx(v int) *UserTypecastSettingUpsert {
+	u.Add(usertypecastsetting.FieldStyleIdx, v)
+	return u
+}
+
+// SetLastPitch sets the "last_pitch" field.
+func (u *UserTypecastSettingUpsert) SetLastPitch(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldLastPitch, v)
+	return u
+}
+
+// UpdateLastPitch sets the "last_pitch" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateLastPitch() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldLastPitch)
+	return u
+}
+
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (u *UserTypecastSettingUpsert) ClearLastPitch() *UserTypecastSettingUpsert {
+	u.SetNull(usertypecastsetting.FieldLastPitch)
+	return u
+}
+
+// SetMode sets the "mode" field.
+func (u *UserTypecastSettingUpsert) SetMode(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldMode, v)
+	return u
+}
+
+// UpdateMode sets the "mode" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateMode() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldMode)
+	return u
+}
+
+// ClearMode clears the value of the "mode" field.
+func (u *UserTypecastSettingUpsert) ClearMode() *UserTypecastSettingUpsert {
+	u.SetNull(usertypecastsetting.FieldMode)
+	return u
+}
+
+// SetPitch sets the "pitch" field.
+func (u *UserTypecastSettingUpsert) SetPitch(v int) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldPitch, v)
+	return u
+}
+
+// UpdatePitch sets the "pitch" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdatePitch() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldPitch)
+	return u
+}
+
+// AddPitch adds v to the "pitch" field.
+func (u *UserTypecastSettingUpsert) AddPitch(v int) *UserTypecastSettingUpsert {
+	u.Add(usertypecastsetting.FieldPitch, v)
+	return u
+}
+
+// SetStyleLabel sets the "style_label" field.
+func (u *UserTypecastSettingUpsert) SetStyleLabel(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldStyleLabel, v)
+	return u
+}
+
+// UpdateStyleLabel sets the "style_label" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateStyleLabel() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldStyleLabel)
+	return u
+}
+
+// SetStyleLabelVersion sets the "style_label_version" field.
+func (u *UserTypecastSettingUpsert) SetStyleLabelVersion(v string) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldStyleLabelVersion, v)
+	return u
+}
+
+// UpdateStyleLabelVersion sets the "style_label_version" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateStyleLabelVersion() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldStyleLabelVersion)
+	return u
+}
+
+// SetTempo sets the "tempo" field.
+func (u *UserTypecastSettingUpsert) SetTempo(v int) *UserTypecastSettingUpsert {
+	u.Set(usertypecastsetting.FieldTempo, v)
+	return u
+}
+
+// UpdateTempo sets the "tempo" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsert) UpdateTempo() *UserTypecastSettingUpsert {
+	u.SetExcluded(usertypecastsetting.FieldTempo)
+	return u
+}
+
+// AddTempo adds v to the "tempo" field.
+func (u *UserTypecastSettingUpsert) AddTempo(v int) *UserTypecastSettingUpsert {
+	u.Add(usertypecastsetting.FieldTempo, v)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.UserTypecastSetting.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *UserTypecastSettingUpsertOne) UpdateNewValues() *UserTypecastSettingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.UserTypecastSetting.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *UserTypecastSettingUpsertOne) Ignore() *UserTypecastSettingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *UserTypecastSettingUpsertOne) DoNothing() *UserTypecastSettingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the UserTypecastSettingCreate.OnConflict
+// documentation for more info.
+func (u *UserTypecastSettingUpsertOne) Update(set func(*UserTypecastSettingUpsert)) *UserTypecastSettingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&UserTypecastSettingUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *UserTypecastSettingUpsertOne) SetUserID(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateUserID() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetActorID sets the "actor_id" field.
+func (u *UserTypecastSettingUpsertOne) SetActorID(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetActorID(v)
+	})
+}
+
+// UpdateActorID sets the "actor_id" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateActorID() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateActorID()
+	})
+}
+
+// SetLang sets the "lang" field.
+func (u *UserTypecastSettingUpsertOne) SetLang(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetLang(v)
+	})
+}
+
+// UpdateLang sets the "lang" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateLang() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateLang()
+	})
+}
+
+// SetMaxSeconds sets the "max_seconds" field.
+func (u *UserTypecastSettingUpsertOne) SetMaxSeconds(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetMaxSeconds(v)
+	})
+}
+
+// AddMaxSeconds adds v to the "max_seconds" field.
+func (u *UserTypecastSettingUpsertOne) AddMaxSeconds(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddMaxSeconds(v)
+	})
+}
+
+// UpdateMaxSeconds sets the "max_seconds" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateMaxSeconds() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateMaxSeconds()
+	})
+}
+
+// SetNaturalness sets the "naturalness" field.
+func (u *UserTypecastSettingUpsertOne) SetNaturalness(v float64) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetNaturalness(v)
+	})
+}
+
+// AddNaturalness adds v to the "naturalness" field.
+func (u *UserTypecastSettingUpsertOne) AddNaturalness(v float64) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddNaturalness(v)
+	})
+}
+
+// UpdateNaturalness sets the "naturalness" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateNaturalness() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateNaturalness()
+	})
+}
+
+// SetSpeedX sets the "speed_x" field.
+func (u *UserTypecastSettingUpsertOne) SetSpeedX(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetSpeedX(v)
+	})
+}
+
+// AddSpeedX adds v to the "speed_x" field.
+func (u *UserTypecastSettingUpsertOne) AddSpeedX(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddSpeedX(v)
+	})
+}
+
+// UpdateSpeedX sets the "speed_x" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateSpeedX() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateSpeedX()
+	})
+}
+
+// SetGid sets the "gid" field.
+func (u *UserTypecastSettingUpsertOne) SetGid(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetGid(v)
+	})
+}
+
+// UpdateGid sets the "gid" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateGid() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateGid()
+	})
+}
+
+// SetStyleIdx sets the "style_idx" field.
+func (u *UserTypecastSettingUpsertOne) SetStyleIdx(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetStyleIdx(v)
+	})
+}
+
+// AddStyleIdx adds v to the "style_idx" field.
+func (u *UserTypecastSettingUpsertOne) AddStyleIdx(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddStyleIdx(v)
+	})
+}
+
+// UpdateStyleIdx sets the "style_idx" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateStyleIdx() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateStyleIdx()
+	})
+}
+
+// SetLastPitch sets the "last_pitch" field.
+func (u *UserTypecastSettingUpsertOne) SetLastPitch(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetLastPitch(v)
+	})
+}
+
+// UpdateLastPitch sets the "last_pitch" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateLastPitch() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateLastPitch()
+	})
+}
+
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (u *UserTypecastSettingUpsertOne) ClearLastPitch() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.ClearLastPitch()
+	})
+}
+
+// SetMode sets the "mode" field.
+func (u *UserTypecastSettingUpsertOne) SetMode(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetMode(v)
+	})
+}
+
+// UpdateMode sets the "mode" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateMode() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateMode()
+	})
+}
+
+// ClearMode clears the value of the "mode" field.
+func (u *UserTypecastSettingUpsertOne) ClearMode() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.ClearMode()
+	})
+}
+
+// SetPitch sets the "pitch" field.
+func (u *UserTypecastSettingUpsertOne) SetPitch(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetPitch(v)
+	})
+}
+
+// AddPitch adds v to the "pitch" field.
+func (u *UserTypecastSettingUpsertOne) AddPitch(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddPitch(v)
+	})
+}
+
+// UpdatePitch sets the "pitch" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdatePitch() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdatePitch()
+	})
+}
+
+// SetStyleLabel sets the "style_label" field.
+func (u *UserTypecastSettingUpsertOne) SetStyleLabel(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetStyleLabel(v)
+	})
+}
+
+// UpdateStyleLabel sets the "style_label" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateStyleLabel() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateStyleLabel()
+	})
+}
+
+// SetStyleLabelVersion sets the "style_label_version" field.
+func (u *UserTypecastSettingUpsertOne) SetStyleLabelVersion(v string) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetStyleLabelVersion(v)
+	})
+}
+
+// UpdateStyleLabelVersion sets the "style_label_version" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateStyleLabelVersion() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateStyleLabelVersion()
+	})
+}
+
+// SetTempo sets the "tempo" field.
+func (u *UserTypecastSettingUpsertOne) SetTempo(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetTempo(v)
+	})
+}
+
+// AddTempo adds v to the "tempo" field.
+func (u *UserTypecastSettingUpsertOne) AddTempo(v int) *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddTempo(v)
+	})
+}
+
+// UpdateTempo sets the "tempo" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertOne) UpdateTempo() *UserTypecastSettingUpsertOne {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateTempo()
+	})
+}
+
+// Exec executes the query.
+func (u *UserTypecastSettingUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for UserTypecastSettingCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *UserTypecastSettingUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *UserTypecastSettingUpsertOne) ID(ctx context.Context) (id int, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *UserTypecastSettingUpsertOne) IDX(ctx context.Context) int {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // UserTypecastSettingCreateBulk is the builder for creating many UserTypecastSetting entities in bulk.
 type UserTypecastSettingCreateBulk struct {
 	config
 	builders []*UserTypecastSettingCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the UserTypecastSetting entities in the database.
@@ -506,6 +1122,7 @@ func (utscb *UserTypecastSettingCreateBulk) Save(ctx context.Context) ([]*UserTy
 					_, err = mutators[i+1].Mutate(root, utscb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = utscb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, utscb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -556,6 +1173,359 @@ func (utscb *UserTypecastSettingCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (utscb *UserTypecastSettingCreateBulk) ExecX(ctx context.Context) {
 	if err := utscb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.UserTypecastSetting.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.UserTypecastSettingUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (utscb *UserTypecastSettingCreateBulk) OnConflict(opts ...sql.ConflictOption) *UserTypecastSettingUpsertBulk {
+	utscb.conflict = opts
+	return &UserTypecastSettingUpsertBulk{
+		create: utscb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.UserTypecastSetting.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (utscb *UserTypecastSettingCreateBulk) OnConflictColumns(columns ...string) *UserTypecastSettingUpsertBulk {
+	utscb.conflict = append(utscb.conflict, sql.ConflictColumns(columns...))
+	return &UserTypecastSettingUpsertBulk{
+		create: utscb,
+	}
+}
+
+// UserTypecastSettingUpsertBulk is the builder for "upsert"-ing
+// a bulk of UserTypecastSetting nodes.
+type UserTypecastSettingUpsertBulk struct {
+	create *UserTypecastSettingCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.UserTypecastSetting.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *UserTypecastSettingUpsertBulk) UpdateNewValues() *UserTypecastSettingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.UserTypecastSetting.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *UserTypecastSettingUpsertBulk) Ignore() *UserTypecastSettingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *UserTypecastSettingUpsertBulk) DoNothing() *UserTypecastSettingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the UserTypecastSettingCreateBulk.OnConflict
+// documentation for more info.
+func (u *UserTypecastSettingUpsertBulk) Update(set func(*UserTypecastSettingUpsert)) *UserTypecastSettingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&UserTypecastSettingUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *UserTypecastSettingUpsertBulk) SetUserID(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateUserID() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetActorID sets the "actor_id" field.
+func (u *UserTypecastSettingUpsertBulk) SetActorID(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetActorID(v)
+	})
+}
+
+// UpdateActorID sets the "actor_id" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateActorID() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateActorID()
+	})
+}
+
+// SetLang sets the "lang" field.
+func (u *UserTypecastSettingUpsertBulk) SetLang(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetLang(v)
+	})
+}
+
+// UpdateLang sets the "lang" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateLang() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateLang()
+	})
+}
+
+// SetMaxSeconds sets the "max_seconds" field.
+func (u *UserTypecastSettingUpsertBulk) SetMaxSeconds(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetMaxSeconds(v)
+	})
+}
+
+// AddMaxSeconds adds v to the "max_seconds" field.
+func (u *UserTypecastSettingUpsertBulk) AddMaxSeconds(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddMaxSeconds(v)
+	})
+}
+
+// UpdateMaxSeconds sets the "max_seconds" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateMaxSeconds() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateMaxSeconds()
+	})
+}
+
+// SetNaturalness sets the "naturalness" field.
+func (u *UserTypecastSettingUpsertBulk) SetNaturalness(v float64) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetNaturalness(v)
+	})
+}
+
+// AddNaturalness adds v to the "naturalness" field.
+func (u *UserTypecastSettingUpsertBulk) AddNaturalness(v float64) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddNaturalness(v)
+	})
+}
+
+// UpdateNaturalness sets the "naturalness" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateNaturalness() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateNaturalness()
+	})
+}
+
+// SetSpeedX sets the "speed_x" field.
+func (u *UserTypecastSettingUpsertBulk) SetSpeedX(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetSpeedX(v)
+	})
+}
+
+// AddSpeedX adds v to the "speed_x" field.
+func (u *UserTypecastSettingUpsertBulk) AddSpeedX(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddSpeedX(v)
+	})
+}
+
+// UpdateSpeedX sets the "speed_x" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateSpeedX() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateSpeedX()
+	})
+}
+
+// SetGid sets the "gid" field.
+func (u *UserTypecastSettingUpsertBulk) SetGid(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetGid(v)
+	})
+}
+
+// UpdateGid sets the "gid" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateGid() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateGid()
+	})
+}
+
+// SetStyleIdx sets the "style_idx" field.
+func (u *UserTypecastSettingUpsertBulk) SetStyleIdx(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetStyleIdx(v)
+	})
+}
+
+// AddStyleIdx adds v to the "style_idx" field.
+func (u *UserTypecastSettingUpsertBulk) AddStyleIdx(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddStyleIdx(v)
+	})
+}
+
+// UpdateStyleIdx sets the "style_idx" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateStyleIdx() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateStyleIdx()
+	})
+}
+
+// SetLastPitch sets the "last_pitch" field.
+func (u *UserTypecastSettingUpsertBulk) SetLastPitch(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetLastPitch(v)
+	})
+}
+
+// UpdateLastPitch sets the "last_pitch" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateLastPitch() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateLastPitch()
+	})
+}
+
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (u *UserTypecastSettingUpsertBulk) ClearLastPitch() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.ClearLastPitch()
+	})
+}
+
+// SetMode sets the "mode" field.
+func (u *UserTypecastSettingUpsertBulk) SetMode(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetMode(v)
+	})
+}
+
+// UpdateMode sets the "mode" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateMode() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateMode()
+	})
+}
+
+// ClearMode clears the value of the "mode" field.
+func (u *UserTypecastSettingUpsertBulk) ClearMode() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.ClearMode()
+	})
+}
+
+// SetPitch sets the "pitch" field.
+func (u *UserTypecastSettingUpsertBulk) SetPitch(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetPitch(v)
+	})
+}
+
+// AddPitch adds v to the "pitch" field.
+func (u *UserTypecastSettingUpsertBulk) AddPitch(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddPitch(v)
+	})
+}
+
+// UpdatePitch sets the "pitch" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdatePitch() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdatePitch()
+	})
+}
+
+// SetStyleLabel sets the "style_label" field.
+func (u *UserTypecastSettingUpsertBulk) SetStyleLabel(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetStyleLabel(v)
+	})
+}
+
+// UpdateStyleLabel sets the "style_label" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateStyleLabel() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateStyleLabel()
+	})
+}
+
+// SetStyleLabelVersion sets the "style_label_version" field.
+func (u *UserTypecastSettingUpsertBulk) SetStyleLabelVersion(v string) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetStyleLabelVersion(v)
+	})
+}
+
+// UpdateStyleLabelVersion sets the "style_label_version" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateStyleLabelVersion() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateStyleLabelVersion()
+	})
+}
+
+// SetTempo sets the "tempo" field.
+func (u *UserTypecastSettingUpsertBulk) SetTempo(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.SetTempo(v)
+	})
+}
+
+// AddTempo adds v to the "tempo" field.
+func (u *UserTypecastSettingUpsertBulk) AddTempo(v int) *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.AddTempo(v)
+	})
+}
+
+// UpdateTempo sets the "tempo" field to the value that was provided on create.
+func (u *UserTypecastSettingUpsertBulk) UpdateTempo() *UserTypecastSettingUpsertBulk {
+	return u.Update(func(s *UserTypecastSettingUpsert) {
+		s.UpdateTempo()
+	})
+}
+
+// Exec executes the query.
+func (u *UserTypecastSettingUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the UserTypecastSettingCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for UserTypecastSettingCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *UserTypecastSettingUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -25,6 +25,10 @@ func init() {
 	usertypecastsettingDescNaturalness := usertypecastsettingFields[4].Descriptor()
 	// usertypecastsetting.DefaultNaturalness holds the default value on creation for the naturalness field.
 	usertypecastsetting.DefaultNaturalness = usertypecastsettingDescNaturalness.Default.(float64)
+	// usertypecastsettingDescSpeedX is the schema descriptor for speed_x field.
+	usertypecastsettingDescSpeedX := usertypecastsettingFields[5].Descriptor()
+	// usertypecastsetting.DefaultSpeedX holds the default value on creation for the speed_x field.
+	usertypecastsetting.DefaultSpeedX = usertypecastsettingDescSpeedX.Default.(int)
 	// usertypecastsettingDescGid is the schema descriptor for gid field.
 	usertypecastsettingDescGid := usertypecastsettingFields[6].Descriptor()
 	// usertypecastsetting.DefaultGid holds the default value on creation for the gid field.

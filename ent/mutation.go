@@ -32,8 +32,8 @@ type UserTypecastSettingMutation struct {
 	op                  Op
 	typ                 string
 	id                  *int
+	user_id             *string
 	actor_id            *string
-	text                *string
 	lang                *string
 	max_seconds         *int
 	addmax_seconds      *int
@@ -156,6 +156,42 @@ func (m *UserTypecastSettingMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
+// SetUserID sets the "user_id" field.
+func (m *UserTypecastSettingMutation) SetUserID(s string) {
+	m.user_id = &s
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *UserTypecastSettingMutation) UserID() (r string, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the UserTypecastSetting entity.
+// If the UserTypecastSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserTypecastSettingMutation) OldUserID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *UserTypecastSettingMutation) ResetUserID() {
+	m.user_id = nil
+}
+
 // SetActorID sets the "actor_id" field.
 func (m *UserTypecastSettingMutation) SetActorID(s string) {
 	m.actor_id = &s
@@ -190,42 +226,6 @@ func (m *UserTypecastSettingMutation) OldActorID(ctx context.Context) (v string,
 // ResetActorID resets all changes to the "actor_id" field.
 func (m *UserTypecastSettingMutation) ResetActorID() {
 	m.actor_id = nil
-}
-
-// SetText sets the "text" field.
-func (m *UserTypecastSettingMutation) SetText(s string) {
-	m.text = &s
-}
-
-// Text returns the value of the "text" field in the mutation.
-func (m *UserTypecastSettingMutation) Text() (r string, exists bool) {
-	v := m.text
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldText returns the old "text" field's value of the UserTypecastSetting entity.
-// If the UserTypecastSetting object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserTypecastSettingMutation) OldText(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldText is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldText requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldText: %w", err)
-	}
-	return oldValue.Text, nil
-}
-
-// ResetText resets all changes to the "text" field.
-func (m *UserTypecastSettingMutation) ResetText() {
-	m.text = nil
 }
 
 // SetLang sets the "lang" field.
@@ -555,9 +555,22 @@ func (m *UserTypecastSettingMutation) OldLastPitch(ctx context.Context) (v *stri
 	return oldValue.LastPitch, nil
 }
 
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (m *UserTypecastSettingMutation) ClearLastPitch() {
+	m.last_pitch = nil
+	m.clearedFields[usertypecastsetting.FieldLastPitch] = struct{}{}
+}
+
+// LastPitchCleared returns if the "last_pitch" field was cleared in this mutation.
+func (m *UserTypecastSettingMutation) LastPitchCleared() bool {
+	_, ok := m.clearedFields[usertypecastsetting.FieldLastPitch]
+	return ok
+}
+
 // ResetLastPitch resets all changes to the "last_pitch" field.
 func (m *UserTypecastSettingMutation) ResetLastPitch() {
 	m.last_pitch = nil
+	delete(m.clearedFields, usertypecastsetting.FieldLastPitch)
 }
 
 // SetMode sets the "mode" field.
@@ -577,7 +590,7 @@ func (m *UserTypecastSettingMutation) Mode() (r string, exists bool) {
 // OldMode returns the old "mode" field's value of the UserTypecastSetting entity.
 // If the UserTypecastSetting object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserTypecastSettingMutation) OldMode(ctx context.Context) (v string, err error) {
+func (m *UserTypecastSettingMutation) OldMode(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldMode is only allowed on UpdateOne operations")
 	}
@@ -591,9 +604,22 @@ func (m *UserTypecastSettingMutation) OldMode(ctx context.Context) (v string, er
 	return oldValue.Mode, nil
 }
 
+// ClearMode clears the value of the "mode" field.
+func (m *UserTypecastSettingMutation) ClearMode() {
+	m.mode = nil
+	m.clearedFields[usertypecastsetting.FieldMode] = struct{}{}
+}
+
+// ModeCleared returns if the "mode" field was cleared in this mutation.
+func (m *UserTypecastSettingMutation) ModeCleared() bool {
+	_, ok := m.clearedFields[usertypecastsetting.FieldMode]
+	return ok
+}
+
 // ResetMode resets all changes to the "mode" field.
 func (m *UserTypecastSettingMutation) ResetMode() {
 	m.mode = nil
+	delete(m.clearedFields, usertypecastsetting.FieldMode)
 }
 
 // SetPitch sets the "pitch" field.
@@ -800,11 +826,11 @@ func (m *UserTypecastSettingMutation) Type() string {
 // AddedFields().
 func (m *UserTypecastSettingMutation) Fields() []string {
 	fields := make([]string, 0, 14)
+	if m.user_id != nil {
+		fields = append(fields, usertypecastsetting.FieldUserID)
+	}
 	if m.actor_id != nil {
 		fields = append(fields, usertypecastsetting.FieldActorID)
-	}
-	if m.text != nil {
-		fields = append(fields, usertypecastsetting.FieldText)
 	}
 	if m.lang != nil {
 		fields = append(fields, usertypecastsetting.FieldLang)
@@ -850,10 +876,10 @@ func (m *UserTypecastSettingMutation) Fields() []string {
 // schema.
 func (m *UserTypecastSettingMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case usertypecastsetting.FieldUserID:
+		return m.UserID()
 	case usertypecastsetting.FieldActorID:
 		return m.ActorID()
-	case usertypecastsetting.FieldText:
-		return m.Text()
 	case usertypecastsetting.FieldLang:
 		return m.Lang()
 	case usertypecastsetting.FieldMaxSeconds:
@@ -887,10 +913,10 @@ func (m *UserTypecastSettingMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserTypecastSettingMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case usertypecastsetting.FieldUserID:
+		return m.OldUserID(ctx)
 	case usertypecastsetting.FieldActorID:
 		return m.OldActorID(ctx)
-	case usertypecastsetting.FieldText:
-		return m.OldText(ctx)
 	case usertypecastsetting.FieldLang:
 		return m.OldLang(ctx)
 	case usertypecastsetting.FieldMaxSeconds:
@@ -924,19 +950,19 @@ func (m *UserTypecastSettingMutation) OldField(ctx context.Context, name string)
 // type.
 func (m *UserTypecastSettingMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case usertypecastsetting.FieldUserID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
 	case usertypecastsetting.FieldActorID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetActorID(v)
-		return nil
-	case usertypecastsetting.FieldText:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetText(v)
 		return nil
 	case usertypecastsetting.FieldLang:
 		v, ok := value.(string)
@@ -1126,7 +1152,14 @@ func (m *UserTypecastSettingMutation) AddField(name string, value ent.Value) err
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserTypecastSettingMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(usertypecastsetting.FieldLastPitch) {
+		fields = append(fields, usertypecastsetting.FieldLastPitch)
+	}
+	if m.FieldCleared(usertypecastsetting.FieldMode) {
+		fields = append(fields, usertypecastsetting.FieldMode)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1139,6 +1172,14 @@ func (m *UserTypecastSettingMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserTypecastSettingMutation) ClearField(name string) error {
+	switch name {
+	case usertypecastsetting.FieldLastPitch:
+		m.ClearLastPitch()
+		return nil
+	case usertypecastsetting.FieldMode:
+		m.ClearMode()
+		return nil
+	}
 	return fmt.Errorf("unknown UserTypecastSetting nullable field %s", name)
 }
 
@@ -1146,11 +1187,11 @@ func (m *UserTypecastSettingMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserTypecastSettingMutation) ResetField(name string) error {
 	switch name {
+	case usertypecastsetting.FieldUserID:
+		m.ResetUserID()
+		return nil
 	case usertypecastsetting.FieldActorID:
 		m.ResetActorID()
-		return nil
-	case usertypecastsetting.FieldText:
-		m.ResetText()
 		return nil
 	case usertypecastsetting.FieldLang:
 		m.ResetLang()

@@ -4,30 +4,27 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/jipark0716/discordTypecast/config"
 	"github.com/jipark0716/discordTypecast/repositories"
 )
 
 type Discord struct {
 	*discordgo.Session
-	Typecast      repositories.Typecast
-	ApplicationId string
+	Typecast       repositories.Typecast
+	UserRepository repositories.UserRepository
+	ApplicationId  string
 }
 
-func NewDiscord(typecast repositories.Typecast) (discord Discord, err error) {
+func NewDiscord(
+	typecast repositories.Typecast,
+	userRepository repositories.UserRepository,
+) (discord Discord, err error) {
+
 	discord = Discord{}
-
+	discord.UserRepository = userRepository
 	discord.Typecast = typecast
-
-	discord.ApplicationId = repositories.
-		GetConfigInstnace().
-		Get("DISCORD_ID").(string)
-
-	discord.Session, err = discordgo.New(
-		repositories.
-			GetConfigInstnace().
-			Get("DISCORD_TOKEN").(string),
-	)
-
+	discord.ApplicationId = config.Get("DISCORD_ID").(string)
+	discord.Session, err = discordgo.New(config.Get("DISCORD_TOKEN").(string))
 	return
 }
 
@@ -62,8 +59,13 @@ func (d *Discord) CreateChangeVoiceCommand() (*discordgo.ApplicationCommand, err
 
 func (d *Discord) Serve() (err error) {
 	d.AddHandler(d.OnInteractionCreate)
+	d.AddHandler(d.OnCreateMessage)
 	d.Open()
 	return
+}
+
+func (d *Discord) OnCreateMessage(s *discordgo.Session, event *discordgo.MessageCreate) {
+
 }
 
 func (d *Discord) OnInteractionCreate(s *discordgo.Session, event *discordgo.InteractionCreate) {
@@ -79,7 +81,6 @@ func (d *Discord) OnInteractionApplicationCommand(event *discordgo.InteractionCr
 	switch event.ApplicationCommandData().Name {
 	case "voice":
 		d.OnExecuteVoiceCommand(event)
-
 	}
 }
 
@@ -90,4 +91,8 @@ func (d *Discord) OnInteractionMessageComponent(event *discordgo.InteractionCrea
 	case CustomID == VoiceActorSelect:
 		d.OnVoiceActorSlect(event)
 	}
+}
+
+func (d *Discord) Close() {
+	d.Session.Close()
 }

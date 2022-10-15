@@ -13,21 +13,26 @@ type UserTypecastSetting struct {
 // Fields of the UserTypecastSetting.
 func (UserTypecastSetting) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("user_id").Unique(),
 		field.String("actor_id"),
-		field.String("text"),
 		field.String("lang").
 			Default("auto"),
 		field.Int("max_seconds").
 			Default(30),
 		field.Float("naturalness").
 			Default(0.8),
-		field.Int("speed_x"),
+		field.Int("speed_x").
+			Default(1),
 		field.String("gid").
 			Default("f8ON1ZpeF0mDFjZTQlr9G"),
 		field.Int("style_idx").
 			Default(0),
-		field.String("last_pitch").Nillable(),
-		field.String("mode"),
+		field.String("last_pitch").
+			Optional().
+			Nillable(),
+		field.String("mode").
+			Optional().
+			Nillable(),
 		field.Int("pitch").
 			Default(0),
 		field.String("style_label").

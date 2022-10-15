@@ -1,4 +1,4 @@
-package services
+package handler
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func report(err error) {
+func Report(err error) {
 	err = errors.Wrap(err, "report error")
 	fmt.Printf("%+v\n", err)
 }

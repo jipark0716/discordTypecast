@@ -1,4 +1,4 @@
-package repositories
+package config
 
 import (
 	"encoding/json"
@@ -14,6 +14,10 @@ type ConfigService struct {
 }
 
 var configInstnace *ConfigService
+
+func Get(key string) interface{} {
+	return GetConfigInstnace().Get(key)
+}
 
 // return config service singleton instance
 func GetConfigInstnace() *ConfigService {

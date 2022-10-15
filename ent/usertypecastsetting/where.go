@@ -78,17 +78,17 @@ func IDLTE(id int) predicate.UserTypecastSetting {
 	})
 }
 
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUserID), v))
+	})
+}
+
 // ActorID applies equality check predicate on the "actor_id" field. It's identical to ActorIDEQ.
 func ActorID(v string) predicate.UserTypecastSetting {
 	return predicate.UserTypecastSetting(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldActorID), v))
-	})
-}
-
-// Text applies equality check predicate on the "text" field. It's identical to TextEQ.
-func Text(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldText), v))
 	})
 }
 
@@ -173,6 +173,105 @@ func StyleLabelVersion(v string) predicate.UserTypecastSetting {
 func Tempo(v int) predicate.UserTypecastSetting {
 	return predicate.UserTypecastSetting(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTempo), v))
+	})
+}
+
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...string) predicate.UserTypecastSetting {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldUserID), v...))
+	})
+}
+
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...string) predicate.UserTypecastSetting {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldUserID), v...))
+	})
+}
+
+// UserIDGT applies the GT predicate on the "user_id" field.
+func UserIDGT(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDGTE applies the GTE predicate on the "user_id" field.
+func UserIDGTE(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDLT applies the LT predicate on the "user_id" field.
+func UserIDLT(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDLTE applies the LTE predicate on the "user_id" field.
+func UserIDLTE(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDContains applies the Contains predicate on the "user_id" field.
+func UserIDContains(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDHasPrefix applies the HasPrefix predicate on the "user_id" field.
+func UserIDHasPrefix(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDHasSuffix applies the HasSuffix predicate on the "user_id" field.
+func UserIDHasSuffix(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDEqualFold applies the EqualFold predicate on the "user_id" field.
+func UserIDEqualFold(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDContainsFold applies the ContainsFold predicate on the "user_id" field.
+func UserIDContainsFold(v string) predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldUserID), v))
 	})
 }
 
@@ -272,105 +371,6 @@ func ActorIDEqualFold(v string) predicate.UserTypecastSetting {
 func ActorIDContainsFold(v string) predicate.UserTypecastSetting {
 	return predicate.UserTypecastSetting(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldActorID), v))
-	})
-}
-
-// TextEQ applies the EQ predicate on the "text" field.
-func TextEQ(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldText), v))
-	})
-}
-
-// TextNEQ applies the NEQ predicate on the "text" field.
-func TextNEQ(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldText), v))
-	})
-}
-
-// TextIn applies the In predicate on the "text" field.
-func TextIn(vs ...string) predicate.UserTypecastSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldText), v...))
-	})
-}
-
-// TextNotIn applies the NotIn predicate on the "text" field.
-func TextNotIn(vs ...string) predicate.UserTypecastSetting {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldText), v...))
-	})
-}
-
-// TextGT applies the GT predicate on the "text" field.
-func TextGT(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldText), v))
-	})
-}
-
-// TextGTE applies the GTE predicate on the "text" field.
-func TextGTE(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldText), v))
-	})
-}
-
-// TextLT applies the LT predicate on the "text" field.
-func TextLT(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldText), v))
-	})
-}
-
-// TextLTE applies the LTE predicate on the "text" field.
-func TextLTE(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldText), v))
-	})
-}
-
-// TextContains applies the Contains predicate on the "text" field.
-func TextContains(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldText), v))
-	})
-}
-
-// TextHasPrefix applies the HasPrefix predicate on the "text" field.
-func TextHasPrefix(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldText), v))
-	})
-}
-
-// TextHasSuffix applies the HasSuffix predicate on the "text" field.
-func TextHasSuffix(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldText), v))
-	})
-}
-
-// TextEqualFold applies the EqualFold predicate on the "text" field.
-func TextEqualFold(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldText), v))
-	})
-}
-
-// TextContainsFold applies the ContainsFold predicate on the "text" field.
-func TextContainsFold(v string) predicate.UserTypecastSetting {
-	return predicate.UserTypecastSetting(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldText), v))
 	})
 }
 
@@ -913,6 +913,20 @@ func LastPitchHasSuffix(v string) predicate.UserTypecastSetting {
 	})
 }
 
+// LastPitchIsNil applies the IsNil predicate on the "last_pitch" field.
+func LastPitchIsNil() predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldLastPitch)))
+	})
+}
+
+// LastPitchNotNil applies the NotNil predicate on the "last_pitch" field.
+func LastPitchNotNil() predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldLastPitch)))
+	})
+}
+
 // LastPitchEqualFold applies the EqualFold predicate on the "last_pitch" field.
 func LastPitchEqualFold(v string) predicate.UserTypecastSetting {
 	return predicate.UserTypecastSetting(func(s *sql.Selector) {
@@ -1009,6 +1023,20 @@ func ModeHasPrefix(v string) predicate.UserTypecastSetting {
 func ModeHasSuffix(v string) predicate.UserTypecastSetting {
 	return predicate.UserTypecastSetting(func(s *sql.Selector) {
 		s.Where(sql.HasSuffix(s.C(FieldMode), v))
+	})
+}
+
+// ModeIsNil applies the IsNil predicate on the "mode" field.
+func ModeIsNil() predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldMode)))
+	})
+}
+
+// ModeNotNil applies the NotNil predicate on the "mode" field.
+func ModeNotNil() predicate.UserTypecastSetting {
+	return predicate.UserTypecastSetting(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldMode)))
 	})
 }
 
