@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/jipark0716/discordTypecast/ent/predicate"
+	"github.com/jipark0716/discordTypecast/ent/typecastmessage"
 	"github.com/jipark0716/discordTypecast/ent/usertypecastsetting"
 
 	"entgo.io/ent"
@@ -23,8 +25,1494 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeTypecastMessage     = "TypecastMessage"
 	TypeUserTypecastSetting = "UserTypecastSetting"
 )
+
+// TypecastMessageMutation represents an operation that mutates the TypecastMessage nodes in the graph.
+type TypecastMessageMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *int
+	user_id             *string
+	text                *string
+	channel_id          *string
+	actor_id            *string
+	lang                *string
+	max_seconds         *int
+	addmax_seconds      *int
+	naturalness         *float64
+	addnaturalness      *float64
+	speed_x             *int
+	addspeed_x          *int
+	gid                 *string
+	style_idx           *int
+	addstyle_idx        *int
+	last_pitch          *string
+	mode                *string
+	pitch               *int
+	addpitch            *int
+	style_label         *string
+	style_label_version *string
+	tempo               *int
+	addtempo            *int
+	status              *int8
+	addstatus           *int8
+	send_at             *time.Time
+	clearedFields       map[string]struct{}
+	done                bool
+	oldValue            func(context.Context) (*TypecastMessage, error)
+	predicates          []predicate.TypecastMessage
+}
+
+var _ ent.Mutation = (*TypecastMessageMutation)(nil)
+
+// typecastmessageOption allows management of the mutation configuration using functional options.
+type typecastmessageOption func(*TypecastMessageMutation)
+
+// newTypecastMessageMutation creates new mutation for the TypecastMessage entity.
+func newTypecastMessageMutation(c config, op Op, opts ...typecastmessageOption) *TypecastMessageMutation {
+	m := &TypecastMessageMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTypecastMessage,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTypecastMessageID sets the ID field of the mutation.
+func withTypecastMessageID(id int) typecastmessageOption {
+	return func(m *TypecastMessageMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TypecastMessage
+		)
+		m.oldValue = func(ctx context.Context) (*TypecastMessage, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TypecastMessage.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTypecastMessage sets the old TypecastMessage of the mutation.
+func withTypecastMessage(node *TypecastMessage) typecastmessageOption {
+	return func(m *TypecastMessageMutation) {
+		m.oldValue = func(context.Context) (*TypecastMessage, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TypecastMessageMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TypecastMessageMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TypecastMessageMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TypecastMessageMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TypecastMessage.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetUserID sets the "user_id" field.
+func (m *TypecastMessageMutation) SetUserID(s string) {
+	m.user_id = &s
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *TypecastMessageMutation) UserID() (r string, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldUserID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *TypecastMessageMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetText sets the "text" field.
+func (m *TypecastMessageMutation) SetText(s string) {
+	m.text = &s
+}
+
+// Text returns the value of the "text" field in the mutation.
+func (m *TypecastMessageMutation) Text() (r string, exists bool) {
+	v := m.text
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldText returns the old "text" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldText(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldText is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldText requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldText: %w", err)
+	}
+	return oldValue.Text, nil
+}
+
+// ResetText resets all changes to the "text" field.
+func (m *TypecastMessageMutation) ResetText() {
+	m.text = nil
+}
+
+// SetChannelID sets the "channel_id" field.
+func (m *TypecastMessageMutation) SetChannelID(s string) {
+	m.channel_id = &s
+}
+
+// ChannelID returns the value of the "channel_id" field in the mutation.
+func (m *TypecastMessageMutation) ChannelID() (r string, exists bool) {
+	v := m.channel_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChannelID returns the old "channel_id" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldChannelID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChannelID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChannelID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChannelID: %w", err)
+	}
+	return oldValue.ChannelID, nil
+}
+
+// ResetChannelID resets all changes to the "channel_id" field.
+func (m *TypecastMessageMutation) ResetChannelID() {
+	m.channel_id = nil
+}
+
+// SetActorID sets the "actor_id" field.
+func (m *TypecastMessageMutation) SetActorID(s string) {
+	m.actor_id = &s
+}
+
+// ActorID returns the value of the "actor_id" field in the mutation.
+func (m *TypecastMessageMutation) ActorID() (r string, exists bool) {
+	v := m.actor_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActorID returns the old "actor_id" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldActorID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActorID: %w", err)
+	}
+	return oldValue.ActorID, nil
+}
+
+// ResetActorID resets all changes to the "actor_id" field.
+func (m *TypecastMessageMutation) ResetActorID() {
+	m.actor_id = nil
+}
+
+// SetLang sets the "lang" field.
+func (m *TypecastMessageMutation) SetLang(s string) {
+	m.lang = &s
+}
+
+// Lang returns the value of the "lang" field in the mutation.
+func (m *TypecastMessageMutation) Lang() (r string, exists bool) {
+	v := m.lang
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLang returns the old "lang" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldLang(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLang is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLang requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLang: %w", err)
+	}
+	return oldValue.Lang, nil
+}
+
+// ResetLang resets all changes to the "lang" field.
+func (m *TypecastMessageMutation) ResetLang() {
+	m.lang = nil
+}
+
+// SetMaxSeconds sets the "max_seconds" field.
+func (m *TypecastMessageMutation) SetMaxSeconds(i int) {
+	m.max_seconds = &i
+	m.addmax_seconds = nil
+}
+
+// MaxSeconds returns the value of the "max_seconds" field in the mutation.
+func (m *TypecastMessageMutation) MaxSeconds() (r int, exists bool) {
+	v := m.max_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMaxSeconds returns the old "max_seconds" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldMaxSeconds(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMaxSeconds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMaxSeconds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMaxSeconds: %w", err)
+	}
+	return oldValue.MaxSeconds, nil
+}
+
+// AddMaxSeconds adds i to the "max_seconds" field.
+func (m *TypecastMessageMutation) AddMaxSeconds(i int) {
+	if m.addmax_seconds != nil {
+		*m.addmax_seconds += i
+	} else {
+		m.addmax_seconds = &i
+	}
+}
+
+// AddedMaxSeconds returns the value that was added to the "max_seconds" field in this mutation.
+func (m *TypecastMessageMutation) AddedMaxSeconds() (r int, exists bool) {
+	v := m.addmax_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMaxSeconds resets all changes to the "max_seconds" field.
+func (m *TypecastMessageMutation) ResetMaxSeconds() {
+	m.max_seconds = nil
+	m.addmax_seconds = nil
+}
+
+// SetNaturalness sets the "naturalness" field.
+func (m *TypecastMessageMutation) SetNaturalness(f float64) {
+	m.naturalness = &f
+	m.addnaturalness = nil
+}
+
+// Naturalness returns the value of the "naturalness" field in the mutation.
+func (m *TypecastMessageMutation) Naturalness() (r float64, exists bool) {
+	v := m.naturalness
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNaturalness returns the old "naturalness" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldNaturalness(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNaturalness is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNaturalness requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNaturalness: %w", err)
+	}
+	return oldValue.Naturalness, nil
+}
+
+// AddNaturalness adds f to the "naturalness" field.
+func (m *TypecastMessageMutation) AddNaturalness(f float64) {
+	if m.addnaturalness != nil {
+		*m.addnaturalness += f
+	} else {
+		m.addnaturalness = &f
+	}
+}
+
+// AddedNaturalness returns the value that was added to the "naturalness" field in this mutation.
+func (m *TypecastMessageMutation) AddedNaturalness() (r float64, exists bool) {
+	v := m.addnaturalness
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetNaturalness resets all changes to the "naturalness" field.
+func (m *TypecastMessageMutation) ResetNaturalness() {
+	m.naturalness = nil
+	m.addnaturalness = nil
+}
+
+// SetSpeedX sets the "speed_x" field.
+func (m *TypecastMessageMutation) SetSpeedX(i int) {
+	m.speed_x = &i
+	m.addspeed_x = nil
+}
+
+// SpeedX returns the value of the "speed_x" field in the mutation.
+func (m *TypecastMessageMutation) SpeedX() (r int, exists bool) {
+	v := m.speed_x
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpeedX returns the old "speed_x" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldSpeedX(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpeedX is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpeedX requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpeedX: %w", err)
+	}
+	return oldValue.SpeedX, nil
+}
+
+// AddSpeedX adds i to the "speed_x" field.
+func (m *TypecastMessageMutation) AddSpeedX(i int) {
+	if m.addspeed_x != nil {
+		*m.addspeed_x += i
+	} else {
+		m.addspeed_x = &i
+	}
+}
+
+// AddedSpeedX returns the value that was added to the "speed_x" field in this mutation.
+func (m *TypecastMessageMutation) AddedSpeedX() (r int, exists bool) {
+	v := m.addspeed_x
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSpeedX resets all changes to the "speed_x" field.
+func (m *TypecastMessageMutation) ResetSpeedX() {
+	m.speed_x = nil
+	m.addspeed_x = nil
+}
+
+// SetGid sets the "gid" field.
+func (m *TypecastMessageMutation) SetGid(s string) {
+	m.gid = &s
+}
+
+// Gid returns the value of the "gid" field in the mutation.
+func (m *TypecastMessageMutation) Gid() (r string, exists bool) {
+	v := m.gid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGid returns the old "gid" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldGid(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGid is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGid requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGid: %w", err)
+	}
+	return oldValue.Gid, nil
+}
+
+// ResetGid resets all changes to the "gid" field.
+func (m *TypecastMessageMutation) ResetGid() {
+	m.gid = nil
+}
+
+// SetStyleIdx sets the "style_idx" field.
+func (m *TypecastMessageMutation) SetStyleIdx(i int) {
+	m.style_idx = &i
+	m.addstyle_idx = nil
+}
+
+// StyleIdx returns the value of the "style_idx" field in the mutation.
+func (m *TypecastMessageMutation) StyleIdx() (r int, exists bool) {
+	v := m.style_idx
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStyleIdx returns the old "style_idx" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldStyleIdx(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStyleIdx is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStyleIdx requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStyleIdx: %w", err)
+	}
+	return oldValue.StyleIdx, nil
+}
+
+// AddStyleIdx adds i to the "style_idx" field.
+func (m *TypecastMessageMutation) AddStyleIdx(i int) {
+	if m.addstyle_idx != nil {
+		*m.addstyle_idx += i
+	} else {
+		m.addstyle_idx = &i
+	}
+}
+
+// AddedStyleIdx returns the value that was added to the "style_idx" field in this mutation.
+func (m *TypecastMessageMutation) AddedStyleIdx() (r int, exists bool) {
+	v := m.addstyle_idx
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStyleIdx resets all changes to the "style_idx" field.
+func (m *TypecastMessageMutation) ResetStyleIdx() {
+	m.style_idx = nil
+	m.addstyle_idx = nil
+}
+
+// SetLastPitch sets the "last_pitch" field.
+func (m *TypecastMessageMutation) SetLastPitch(s string) {
+	m.last_pitch = &s
+}
+
+// LastPitch returns the value of the "last_pitch" field in the mutation.
+func (m *TypecastMessageMutation) LastPitch() (r string, exists bool) {
+	v := m.last_pitch
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastPitch returns the old "last_pitch" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldLastPitch(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastPitch is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastPitch requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastPitch: %w", err)
+	}
+	return oldValue.LastPitch, nil
+}
+
+// ResetLastPitch resets all changes to the "last_pitch" field.
+func (m *TypecastMessageMutation) ResetLastPitch() {
+	m.last_pitch = nil
+}
+
+// SetMode sets the "mode" field.
+func (m *TypecastMessageMutation) SetMode(s string) {
+	m.mode = &s
+}
+
+// Mode returns the value of the "mode" field in the mutation.
+func (m *TypecastMessageMutation) Mode() (r string, exists bool) {
+	v := m.mode
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMode returns the old "mode" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldMode(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMode: %w", err)
+	}
+	return oldValue.Mode, nil
+}
+
+// ResetMode resets all changes to the "mode" field.
+func (m *TypecastMessageMutation) ResetMode() {
+	m.mode = nil
+}
+
+// SetPitch sets the "pitch" field.
+func (m *TypecastMessageMutation) SetPitch(i int) {
+	m.pitch = &i
+	m.addpitch = nil
+}
+
+// Pitch returns the value of the "pitch" field in the mutation.
+func (m *TypecastMessageMutation) Pitch() (r int, exists bool) {
+	v := m.pitch
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPitch returns the old "pitch" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldPitch(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPitch is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPitch requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPitch: %w", err)
+	}
+	return oldValue.Pitch, nil
+}
+
+// AddPitch adds i to the "pitch" field.
+func (m *TypecastMessageMutation) AddPitch(i int) {
+	if m.addpitch != nil {
+		*m.addpitch += i
+	} else {
+		m.addpitch = &i
+	}
+}
+
+// AddedPitch returns the value that was added to the "pitch" field in this mutation.
+func (m *TypecastMessageMutation) AddedPitch() (r int, exists bool) {
+	v := m.addpitch
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPitch resets all changes to the "pitch" field.
+func (m *TypecastMessageMutation) ResetPitch() {
+	m.pitch = nil
+	m.addpitch = nil
+}
+
+// SetStyleLabel sets the "style_label" field.
+func (m *TypecastMessageMutation) SetStyleLabel(s string) {
+	m.style_label = &s
+}
+
+// StyleLabel returns the value of the "style_label" field in the mutation.
+func (m *TypecastMessageMutation) StyleLabel() (r string, exists bool) {
+	v := m.style_label
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStyleLabel returns the old "style_label" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldStyleLabel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStyleLabel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStyleLabel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStyleLabel: %w", err)
+	}
+	return oldValue.StyleLabel, nil
+}
+
+// ResetStyleLabel resets all changes to the "style_label" field.
+func (m *TypecastMessageMutation) ResetStyleLabel() {
+	m.style_label = nil
+}
+
+// SetStyleLabelVersion sets the "style_label_version" field.
+func (m *TypecastMessageMutation) SetStyleLabelVersion(s string) {
+	m.style_label_version = &s
+}
+
+// StyleLabelVersion returns the value of the "style_label_version" field in the mutation.
+func (m *TypecastMessageMutation) StyleLabelVersion() (r string, exists bool) {
+	v := m.style_label_version
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStyleLabelVersion returns the old "style_label_version" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldStyleLabelVersion(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStyleLabelVersion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStyleLabelVersion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStyleLabelVersion: %w", err)
+	}
+	return oldValue.StyleLabelVersion, nil
+}
+
+// ResetStyleLabelVersion resets all changes to the "style_label_version" field.
+func (m *TypecastMessageMutation) ResetStyleLabelVersion() {
+	m.style_label_version = nil
+}
+
+// SetTempo sets the "tempo" field.
+func (m *TypecastMessageMutation) SetTempo(i int) {
+	m.tempo = &i
+	m.addtempo = nil
+}
+
+// Tempo returns the value of the "tempo" field in the mutation.
+func (m *TypecastMessageMutation) Tempo() (r int, exists bool) {
+	v := m.tempo
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTempo returns the old "tempo" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldTempo(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTempo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTempo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTempo: %w", err)
+	}
+	return oldValue.Tempo, nil
+}
+
+// AddTempo adds i to the "tempo" field.
+func (m *TypecastMessageMutation) AddTempo(i int) {
+	if m.addtempo != nil {
+		*m.addtempo += i
+	} else {
+		m.addtempo = &i
+	}
+}
+
+// AddedTempo returns the value that was added to the "tempo" field in this mutation.
+func (m *TypecastMessageMutation) AddedTempo() (r int, exists bool) {
+	v := m.addtempo
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTempo resets all changes to the "tempo" field.
+func (m *TypecastMessageMutation) ResetTempo() {
+	m.tempo = nil
+	m.addtempo = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *TypecastMessageMutation) SetStatus(i int8) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *TypecastMessageMutation) Status() (r int8, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldStatus(ctx context.Context) (v int8, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *TypecastMessageMutation) AddStatus(i int8) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *TypecastMessageMutation) AddedStatus() (r int8, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *TypecastMessageMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetSendAt sets the "send_at" field.
+func (m *TypecastMessageMutation) SetSendAt(t time.Time) {
+	m.send_at = &t
+}
+
+// SendAt returns the value of the "send_at" field in the mutation.
+func (m *TypecastMessageMutation) SendAt() (r time.Time, exists bool) {
+	v := m.send_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSendAt returns the old "send_at" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldSendAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSendAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSendAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSendAt: %w", err)
+	}
+	return oldValue.SendAt, nil
+}
+
+// ClearSendAt clears the value of the "send_at" field.
+func (m *TypecastMessageMutation) ClearSendAt() {
+	m.send_at = nil
+	m.clearedFields[typecastmessage.FieldSendAt] = struct{}{}
+}
+
+// SendAtCleared returns if the "send_at" field was cleared in this mutation.
+func (m *TypecastMessageMutation) SendAtCleared() bool {
+	_, ok := m.clearedFields[typecastmessage.FieldSendAt]
+	return ok
+}
+
+// ResetSendAt resets all changes to the "send_at" field.
+func (m *TypecastMessageMutation) ResetSendAt() {
+	m.send_at = nil
+	delete(m.clearedFields, typecastmessage.FieldSendAt)
+}
+
+// Where appends a list predicates to the TypecastMessageMutation builder.
+func (m *TypecastMessageMutation) Where(ps ...predicate.TypecastMessage) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *TypecastMessageMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (TypecastMessage).
+func (m *TypecastMessageMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TypecastMessageMutation) Fields() []string {
+	fields := make([]string, 0, 18)
+	if m.user_id != nil {
+		fields = append(fields, typecastmessage.FieldUserID)
+	}
+	if m.text != nil {
+		fields = append(fields, typecastmessage.FieldText)
+	}
+	if m.channel_id != nil {
+		fields = append(fields, typecastmessage.FieldChannelID)
+	}
+	if m.actor_id != nil {
+		fields = append(fields, typecastmessage.FieldActorID)
+	}
+	if m.lang != nil {
+		fields = append(fields, typecastmessage.FieldLang)
+	}
+	if m.max_seconds != nil {
+		fields = append(fields, typecastmessage.FieldMaxSeconds)
+	}
+	if m.naturalness != nil {
+		fields = append(fields, typecastmessage.FieldNaturalness)
+	}
+	if m.speed_x != nil {
+		fields = append(fields, typecastmessage.FieldSpeedX)
+	}
+	if m.gid != nil {
+		fields = append(fields, typecastmessage.FieldGid)
+	}
+	if m.style_idx != nil {
+		fields = append(fields, typecastmessage.FieldStyleIdx)
+	}
+	if m.last_pitch != nil {
+		fields = append(fields, typecastmessage.FieldLastPitch)
+	}
+	if m.mode != nil {
+		fields = append(fields, typecastmessage.FieldMode)
+	}
+	if m.pitch != nil {
+		fields = append(fields, typecastmessage.FieldPitch)
+	}
+	if m.style_label != nil {
+		fields = append(fields, typecastmessage.FieldStyleLabel)
+	}
+	if m.style_label_version != nil {
+		fields = append(fields, typecastmessage.FieldStyleLabelVersion)
+	}
+	if m.tempo != nil {
+		fields = append(fields, typecastmessage.FieldTempo)
+	}
+	if m.status != nil {
+		fields = append(fields, typecastmessage.FieldStatus)
+	}
+	if m.send_at != nil {
+		fields = append(fields, typecastmessage.FieldSendAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TypecastMessageMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case typecastmessage.FieldUserID:
+		return m.UserID()
+	case typecastmessage.FieldText:
+		return m.Text()
+	case typecastmessage.FieldChannelID:
+		return m.ChannelID()
+	case typecastmessage.FieldActorID:
+		return m.ActorID()
+	case typecastmessage.FieldLang:
+		return m.Lang()
+	case typecastmessage.FieldMaxSeconds:
+		return m.MaxSeconds()
+	case typecastmessage.FieldNaturalness:
+		return m.Naturalness()
+	case typecastmessage.FieldSpeedX:
+		return m.SpeedX()
+	case typecastmessage.FieldGid:
+		return m.Gid()
+	case typecastmessage.FieldStyleIdx:
+		return m.StyleIdx()
+	case typecastmessage.FieldLastPitch:
+		return m.LastPitch()
+	case typecastmessage.FieldMode:
+		return m.Mode()
+	case typecastmessage.FieldPitch:
+		return m.Pitch()
+	case typecastmessage.FieldStyleLabel:
+		return m.StyleLabel()
+	case typecastmessage.FieldStyleLabelVersion:
+		return m.StyleLabelVersion()
+	case typecastmessage.FieldTempo:
+		return m.Tempo()
+	case typecastmessage.FieldStatus:
+		return m.Status()
+	case typecastmessage.FieldSendAt:
+		return m.SendAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TypecastMessageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case typecastmessage.FieldUserID:
+		return m.OldUserID(ctx)
+	case typecastmessage.FieldText:
+		return m.OldText(ctx)
+	case typecastmessage.FieldChannelID:
+		return m.OldChannelID(ctx)
+	case typecastmessage.FieldActorID:
+		return m.OldActorID(ctx)
+	case typecastmessage.FieldLang:
+		return m.OldLang(ctx)
+	case typecastmessage.FieldMaxSeconds:
+		return m.OldMaxSeconds(ctx)
+	case typecastmessage.FieldNaturalness:
+		return m.OldNaturalness(ctx)
+	case typecastmessage.FieldSpeedX:
+		return m.OldSpeedX(ctx)
+	case typecastmessage.FieldGid:
+		return m.OldGid(ctx)
+	case typecastmessage.FieldStyleIdx:
+		return m.OldStyleIdx(ctx)
+	case typecastmessage.FieldLastPitch:
+		return m.OldLastPitch(ctx)
+	case typecastmessage.FieldMode:
+		return m.OldMode(ctx)
+	case typecastmessage.FieldPitch:
+		return m.OldPitch(ctx)
+	case typecastmessage.FieldStyleLabel:
+		return m.OldStyleLabel(ctx)
+	case typecastmessage.FieldStyleLabelVersion:
+		return m.OldStyleLabelVersion(ctx)
+	case typecastmessage.FieldTempo:
+		return m.OldTempo(ctx)
+	case typecastmessage.FieldStatus:
+		return m.OldStatus(ctx)
+	case typecastmessage.FieldSendAt:
+		return m.OldSendAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown TypecastMessage field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TypecastMessageMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case typecastmessage.FieldUserID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case typecastmessage.FieldText:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetText(v)
+		return nil
+	case typecastmessage.FieldChannelID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChannelID(v)
+		return nil
+	case typecastmessage.FieldActorID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActorID(v)
+		return nil
+	case typecastmessage.FieldLang:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLang(v)
+		return nil
+	case typecastmessage.FieldMaxSeconds:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMaxSeconds(v)
+		return nil
+	case typecastmessage.FieldNaturalness:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNaturalness(v)
+		return nil
+	case typecastmessage.FieldSpeedX:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpeedX(v)
+		return nil
+	case typecastmessage.FieldGid:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGid(v)
+		return nil
+	case typecastmessage.FieldStyleIdx:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStyleIdx(v)
+		return nil
+	case typecastmessage.FieldLastPitch:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastPitch(v)
+		return nil
+	case typecastmessage.FieldMode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMode(v)
+		return nil
+	case typecastmessage.FieldPitch:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPitch(v)
+		return nil
+	case typecastmessage.FieldStyleLabel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStyleLabel(v)
+		return nil
+	case typecastmessage.FieldStyleLabelVersion:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStyleLabelVersion(v)
+		return nil
+	case typecastmessage.FieldTempo:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTempo(v)
+		return nil
+	case typecastmessage.FieldStatus:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case typecastmessage.FieldSendAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSendAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TypecastMessage field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TypecastMessageMutation) AddedFields() []string {
+	var fields []string
+	if m.addmax_seconds != nil {
+		fields = append(fields, typecastmessage.FieldMaxSeconds)
+	}
+	if m.addnaturalness != nil {
+		fields = append(fields, typecastmessage.FieldNaturalness)
+	}
+	if m.addspeed_x != nil {
+		fields = append(fields, typecastmessage.FieldSpeedX)
+	}
+	if m.addstyle_idx != nil {
+		fields = append(fields, typecastmessage.FieldStyleIdx)
+	}
+	if m.addpitch != nil {
+		fields = append(fields, typecastmessage.FieldPitch)
+	}
+	if m.addtempo != nil {
+		fields = append(fields, typecastmessage.FieldTempo)
+	}
+	if m.addstatus != nil {
+		fields = append(fields, typecastmessage.FieldStatus)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TypecastMessageMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case typecastmessage.FieldMaxSeconds:
+		return m.AddedMaxSeconds()
+	case typecastmessage.FieldNaturalness:
+		return m.AddedNaturalness()
+	case typecastmessage.FieldSpeedX:
+		return m.AddedSpeedX()
+	case typecastmessage.FieldStyleIdx:
+		return m.AddedStyleIdx()
+	case typecastmessage.FieldPitch:
+		return m.AddedPitch()
+	case typecastmessage.FieldTempo:
+		return m.AddedTempo()
+	case typecastmessage.FieldStatus:
+		return m.AddedStatus()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TypecastMessageMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case typecastmessage.FieldMaxSeconds:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMaxSeconds(v)
+		return nil
+	case typecastmessage.FieldNaturalness:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddNaturalness(v)
+		return nil
+	case typecastmessage.FieldSpeedX:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpeedX(v)
+		return nil
+	case typecastmessage.FieldStyleIdx:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStyleIdx(v)
+		return nil
+	case typecastmessage.FieldPitch:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPitch(v)
+		return nil
+	case typecastmessage.FieldTempo:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTempo(v)
+		return nil
+	case typecastmessage.FieldStatus:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TypecastMessage numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TypecastMessageMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(typecastmessage.FieldSendAt) {
+		fields = append(fields, typecastmessage.FieldSendAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TypecastMessageMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TypecastMessageMutation) ClearField(name string) error {
+	switch name {
+	case typecastmessage.FieldSendAt:
+		m.ClearSendAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TypecastMessage nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TypecastMessageMutation) ResetField(name string) error {
+	switch name {
+	case typecastmessage.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case typecastmessage.FieldText:
+		m.ResetText()
+		return nil
+	case typecastmessage.FieldChannelID:
+		m.ResetChannelID()
+		return nil
+	case typecastmessage.FieldActorID:
+		m.ResetActorID()
+		return nil
+	case typecastmessage.FieldLang:
+		m.ResetLang()
+		return nil
+	case typecastmessage.FieldMaxSeconds:
+		m.ResetMaxSeconds()
+		return nil
+	case typecastmessage.FieldNaturalness:
+		m.ResetNaturalness()
+		return nil
+	case typecastmessage.FieldSpeedX:
+		m.ResetSpeedX()
+		return nil
+	case typecastmessage.FieldGid:
+		m.ResetGid()
+		return nil
+	case typecastmessage.FieldStyleIdx:
+		m.ResetStyleIdx()
+		return nil
+	case typecastmessage.FieldLastPitch:
+		m.ResetLastPitch()
+		return nil
+	case typecastmessage.FieldMode:
+		m.ResetMode()
+		return nil
+	case typecastmessage.FieldPitch:
+		m.ResetPitch()
+		return nil
+	case typecastmessage.FieldStyleLabel:
+		m.ResetStyleLabel()
+		return nil
+	case typecastmessage.FieldStyleLabelVersion:
+		m.ResetStyleLabelVersion()
+		return nil
+	case typecastmessage.FieldTempo:
+		m.ResetTempo()
+		return nil
+	case typecastmessage.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case typecastmessage.FieldSendAt:
+		m.ResetSendAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TypecastMessage field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TypecastMessageMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TypecastMessageMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TypecastMessageMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TypecastMessageMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TypecastMessageMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TypecastMessageMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TypecastMessageMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown TypecastMessage unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TypecastMessageMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown TypecastMessage edge %s", name)
+}
 
 // UserTypecastSettingMutation represents an operation that mutates the UserTypecastSetting nodes in the graph.
 type UserTypecastSettingMutation struct {

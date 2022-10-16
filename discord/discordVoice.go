@@ -1,4 +1,4 @@
-package services
+package discord
 
 import (
 	"fmt"
@@ -100,7 +100,7 @@ func (d *Discord) GetPaginateButton(page int, lastpage int, idPrefix string) (ac
 }
 
 func (d *Discord) OnVoiceActorSlect(event *discordgo.InteractionCreate) {
-	values := event.Interaction.MessageComponentData().Values
+	values := event.MessageComponentData().Values
 	if len(values) < 1 {
 		handler.Report(fmt.Errorf("not enough values actor select"))
 		return

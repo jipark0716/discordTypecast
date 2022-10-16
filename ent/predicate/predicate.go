@@ -6,5 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// TypecastMessage is the predicate function for typecastmessage builders.
+type TypecastMessage func(*sql.Selector)
+
 // UserTypecastSetting is the predicate function for usertypecastsetting builders.
 type UserTypecastSetting func(*sql.Selector)

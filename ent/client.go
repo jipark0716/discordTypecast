@@ -10,6 +10,7 @@ import (
 
 	"github.com/jipark0716/discordTypecast/ent/migrate"
 
+	"github.com/jipark0716/discordTypecast/ent/typecastmessage"
 	"github.com/jipark0716/discordTypecast/ent/usertypecastsetting"
 
 	"entgo.io/ent/dialect"
@@ -21,6 +22,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// TypecastMessage is the client for interacting with the TypecastMessage builders.
+	TypecastMessage *TypecastMessageClient
 	// UserTypecastSetting is the client for interacting with the UserTypecastSetting builders.
 	UserTypecastSetting *UserTypecastSettingClient
 }
@@ -36,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.TypecastMessage = NewTypecastMessageClient(c.config)
 	c.UserTypecastSetting = NewUserTypecastSettingClient(c.config)
 }
 
@@ -70,6 +74,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:                 ctx,
 		config:              cfg,
+		TypecastMessage:     NewTypecastMessageClient(cfg),
 		UserTypecastSetting: NewUserTypecastSettingClient(cfg),
 	}, nil
 }
@@ -90,6 +95,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:                 ctx,
 		config:              cfg,
+		TypecastMessage:     NewTypecastMessageClient(cfg),
 		UserTypecastSetting: NewUserTypecastSettingClient(cfg),
 	}, nil
 }
@@ -97,7 +103,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		UserTypecastSetting.
+//		TypecastMessage.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -119,7 +125,98 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.TypecastMessage.Use(hooks...)
 	c.UserTypecastSetting.Use(hooks...)
+}
+
+// TypecastMessageClient is a client for the TypecastMessage schema.
+type TypecastMessageClient struct {
+	config
+}
+
+// NewTypecastMessageClient returns a client for the TypecastMessage from the given config.
+func NewTypecastMessageClient(c config) *TypecastMessageClient {
+	return &TypecastMessageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `typecastmessage.Hooks(f(g(h())))`.
+func (c *TypecastMessageClient) Use(hooks ...Hook) {
+	c.hooks.TypecastMessage = append(c.hooks.TypecastMessage, hooks...)
+}
+
+// Create returns a builder for creating a TypecastMessage entity.
+func (c *TypecastMessageClient) Create() *TypecastMessageCreate {
+	mutation := newTypecastMessageMutation(c.config, OpCreate)
+	return &TypecastMessageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TypecastMessage entities.
+func (c *TypecastMessageClient) CreateBulk(builders ...*TypecastMessageCreate) *TypecastMessageCreateBulk {
+	return &TypecastMessageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TypecastMessage.
+func (c *TypecastMessageClient) Update() *TypecastMessageUpdate {
+	mutation := newTypecastMessageMutation(c.config, OpUpdate)
+	return &TypecastMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TypecastMessageClient) UpdateOne(tm *TypecastMessage) *TypecastMessageUpdateOne {
+	mutation := newTypecastMessageMutation(c.config, OpUpdateOne, withTypecastMessage(tm))
+	return &TypecastMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TypecastMessageClient) UpdateOneID(id int) *TypecastMessageUpdateOne {
+	mutation := newTypecastMessageMutation(c.config, OpUpdateOne, withTypecastMessageID(id))
+	return &TypecastMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TypecastMessage.
+func (c *TypecastMessageClient) Delete() *TypecastMessageDelete {
+	mutation := newTypecastMessageMutation(c.config, OpDelete)
+	return &TypecastMessageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TypecastMessageClient) DeleteOne(tm *TypecastMessage) *TypecastMessageDeleteOne {
+	return c.DeleteOneID(tm.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *TypecastMessageClient) DeleteOneID(id int) *TypecastMessageDeleteOne {
+	builder := c.Delete().Where(typecastmessage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TypecastMessageDeleteOne{builder}
+}
+
+// Query returns a query builder for TypecastMessage.
+func (c *TypecastMessageClient) Query() *TypecastMessageQuery {
+	return &TypecastMessageQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a TypecastMessage entity by its id.
+func (c *TypecastMessageClient) Get(ctx context.Context, id int) (*TypecastMessage, error) {
+	return c.Query().Where(typecastmessage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TypecastMessageClient) GetX(ctx context.Context, id int) *TypecastMessage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TypecastMessageClient) Hooks() []Hook {
+	return c.hooks.TypecastMessage
 }
 
 // UserTypecastSettingClient is a client for the UserTypecastSetting schema.

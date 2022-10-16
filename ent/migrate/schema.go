@@ -8,6 +8,34 @@ import (
 )
 
 var (
+	// TypecastMessagesColumns holds the columns for the "typecast_messages" table.
+	TypecastMessagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeString},
+		{Name: "text", Type: field.TypeString},
+		{Name: "channel_id", Type: field.TypeString},
+		{Name: "actor_id", Type: field.TypeString},
+		{Name: "lang", Type: field.TypeString},
+		{Name: "max_seconds", Type: field.TypeInt},
+		{Name: "naturalness", Type: field.TypeFloat64},
+		{Name: "speed_x", Type: field.TypeInt},
+		{Name: "gid", Type: field.TypeString},
+		{Name: "style_idx", Type: field.TypeInt},
+		{Name: "last_pitch", Type: field.TypeString},
+		{Name: "mode", Type: field.TypeString},
+		{Name: "pitch", Type: field.TypeInt},
+		{Name: "style_label", Type: field.TypeString},
+		{Name: "style_label_version", Type: field.TypeString},
+		{Name: "tempo", Type: field.TypeInt},
+		{Name: "status", Type: field.TypeInt8, Default: 0},
+		{Name: "send_at", Type: field.TypeTime, Nullable: true},
+	}
+	// TypecastMessagesTable holds the schema information for the "typecast_messages" table.
+	TypecastMessagesTable = &schema.Table{
+		Name:       "typecast_messages",
+		Columns:    TypecastMessagesColumns,
+		PrimaryKey: []*schema.Column{TypecastMessagesColumns[0]},
+	}
 	// UserTypecastSettingsColumns holds the columns for the "user_typecast_settings" table.
 	UserTypecastSettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -24,7 +52,7 @@ var (
 		{Name: "pitch", Type: field.TypeInt, Default: 0},
 		{Name: "style_label", Type: field.TypeString, Default: "0"},
 		{Name: "style_label_version", Type: field.TypeString, Default: "v2"},
-		{Name: "tempo", Type: field.TypeInt, Default: 0},
+		{Name: "tempo", Type: field.TypeInt, Default: 1},
 	}
 	// UserTypecastSettingsTable holds the schema information for the "user_typecast_settings" table.
 	UserTypecastSettingsTable = &schema.Table{
@@ -34,6 +62,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		TypecastMessagesTable,
 		UserTypecastSettingsTable,
 	}
 )

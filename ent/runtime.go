@@ -4,6 +4,7 @@ package ent
 
 import (
 	"github.com/jipark0716/discordTypecast/ent/schema"
+	"github.com/jipark0716/discordTypecast/ent/typecastmessage"
 	"github.com/jipark0716/discordTypecast/ent/usertypecastsetting"
 )
 
@@ -11,6 +12,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	typecastmessageFields := schema.TypecastMessage{}.Fields()
+	_ = typecastmessageFields
+	// typecastmessageDescStatus is the schema descriptor for status field.
+	typecastmessageDescStatus := typecastmessageFields[16].Descriptor()
+	// typecastmessage.DefaultStatus holds the default value on creation for the status field.
+	typecastmessage.DefaultStatus = typecastmessageDescStatus.Default.(int8)
 	usertypecastsettingFields := schema.UserTypecastSetting{}.Fields()
 	_ = usertypecastsettingFields
 	// usertypecastsettingDescLang is the schema descriptor for lang field.

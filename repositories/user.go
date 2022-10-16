@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jipark0716/discordTypecast/ent"
+	"github.com/jipark0716/discordTypecast/ent/usertypecastsetting"
 )
 
 type UserRepository struct {
@@ -26,4 +27,16 @@ func (ur *UserRepository) SaveActor(userId string, actorId string) error {
 		OnConflict().
 		UpdateActorID().
 		Exec(context.Background())
+}
+
+func (ur *UserRepository) FindByUserId(userId string) (*ent.UserTypecastSetting, error) {
+	return ur.
+		Database.
+		UserTypecastSetting.
+		Query().
+		Where(
+			usertypecastsetting.
+				UserID(userId),
+		).
+		Only(context.Background())
 }

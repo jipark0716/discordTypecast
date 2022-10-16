@@ -9,6 +9,19 @@ import (
 	"github.com/jipark0716/discordTypecast/ent"
 )
 
+// The TypecastMessageFunc type is an adapter to allow the use of ordinary
+// function as TypecastMessage mutator.
+type TypecastMessageFunc func(context.Context, *ent.TypecastMessageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TypecastMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TypecastMessageMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TypecastMessageMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserTypecastSettingFunc type is an adapter to allow the use of ordinary
 // function as UserTypecastSetting mutator.
 type UserTypecastSettingFunc func(context.Context, *ent.UserTypecastSettingMutation) (ent.Value, error)

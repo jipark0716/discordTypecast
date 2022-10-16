@@ -1,4 +1,4 @@
-package services
+package discord
 
 import (
 	"strings"
@@ -44,6 +44,31 @@ func (d *Discord) ApplicationCommandCreate(cmd *discordgo.ApplicationCommand) (*
 	)
 }
 
+func (d *Discord) CreateCommand() (err error) {
+	_, err = d.CreateChangeVoiceCommand()
+	if err != nil {
+		return
+	}
+
+	_, err = d.CreateSpeakCommand()
+	return
+}
+
+func (d *Discord) CreateSpeakCommand() (*discordgo.ApplicationCommand, error) {
+	option := &discordgo.ApplicationCommandOption{
+		Type:        discordgo.ApplicationCommandOptionString,
+		Name:        "text",
+		Required:    true,
+		Description: "할말",
+	}
+
+	return d.ApplicationCommandCreate(&discordgo.ApplicationCommand{
+		Name:        "speak",
+		Description: "tts 실행",
+		Options:     []*discordgo.ApplicationCommandOption{option},
+	})
+}
+
 func (d *Discord) CreateChangeVoiceCommand() (*discordgo.ApplicationCommand, error) {
 	option := &discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionString,
@@ -65,7 +90,6 @@ func (d *Discord) Serve() (err error) {
 }
 
 func (d *Discord) OnCreateMessage(s *discordgo.Session, event *discordgo.MessageCreate) {
-
 }
 
 func (d *Discord) OnInteractionCreate(s *discordgo.Session, event *discordgo.InteractionCreate) {
@@ -81,6 +105,8 @@ func (d *Discord) OnInteractionApplicationCommand(event *discordgo.InteractionCr
 	switch event.ApplicationCommandData().Name {
 	case "voice":
 		d.OnExecuteVoiceCommand(event)
+	case "speak":
+		d.OnSpeakTts(event)
 	}
 }
 

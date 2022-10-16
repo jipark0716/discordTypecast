@@ -40,7 +40,7 @@ func (UserTypecastSetting) Fields() []ent.Field {
 		field.String("style_label_version").
 			Default("v2"),
 		field.Int("tempo").
-			Default(0),
+			Default(1),
 	}
 }
 
