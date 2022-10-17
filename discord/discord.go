@@ -163,8 +163,13 @@ func (d *Discord) DisconnectIdleConnect(vc *VoiceConnection) {
 	case <-vc.idleConnect:
 		break
 	case <-time.After(time.Second * 300):
-		vc.Disconnect()
+		d.Disconnect(vc)
 	}
+}
+
+func (d *Discord) Disconnect(vc *VoiceConnection) {
+	delete(d.VoiceConnections, vc.GuildID)
+	vc.Disconnect()
 }
 
 func (vc *VoiceConnection) PlayAudioFile(filename string, stop <-chan bool) {
