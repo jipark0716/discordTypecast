@@ -15,6 +15,7 @@ func (TypecastMessage) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("user_id"),
 		field.String("text"),
+		field.String("guild_id"),
 		field.String("channel_id"),
 		field.String("actor_id"),
 		field.String("lang"),
@@ -24,9 +25,11 @@ func (TypecastMessage) Fields() []ent.Field {
 		field.String("gid"),
 		field.Int("style_idx"),
 		field.String("last_pitch").
+			Optional().
 			Nillable(),
 		field.String("mode").
-			Nillable(),
+			Nillable().
+			Optional(),
 		field.Int("pitch"),
 		field.String("style_label"),
 		field.String("style_label_version"),

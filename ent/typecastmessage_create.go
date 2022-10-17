@@ -34,6 +34,12 @@ func (tmc *TypecastMessageCreate) SetText(s string) *TypecastMessageCreate {
 	return tmc
 }
 
+// SetGuildID sets the "guild_id" field.
+func (tmc *TypecastMessageCreate) SetGuildID(s string) *TypecastMessageCreate {
+	tmc.mutation.SetGuildID(s)
+	return tmc
+}
+
 // SetChannelID sets the "channel_id" field.
 func (tmc *TypecastMessageCreate) SetChannelID(s string) *TypecastMessageCreate {
 	tmc.mutation.SetChannelID(s)
@@ -88,9 +94,25 @@ func (tmc *TypecastMessageCreate) SetLastPitch(s string) *TypecastMessageCreate 
 	return tmc
 }
 
+// SetNillableLastPitch sets the "last_pitch" field if the given value is not nil.
+func (tmc *TypecastMessageCreate) SetNillableLastPitch(s *string) *TypecastMessageCreate {
+	if s != nil {
+		tmc.SetLastPitch(*s)
+	}
+	return tmc
+}
+
 // SetMode sets the "mode" field.
 func (tmc *TypecastMessageCreate) SetMode(s string) *TypecastMessageCreate {
 	tmc.mutation.SetMode(s)
+	return tmc
+}
+
+// SetNillableMode sets the "mode" field if the given value is not nil.
+func (tmc *TypecastMessageCreate) SetNillableMode(s *string) *TypecastMessageCreate {
+	if s != nil {
+		tmc.SetMode(*s)
+	}
 	return tmc
 }
 
@@ -237,6 +259,9 @@ func (tmc *TypecastMessageCreate) check() error {
 	if _, ok := tmc.mutation.Text(); !ok {
 		return &ValidationError{Name: "text", err: errors.New(`ent: missing required field "TypecastMessage.text"`)}
 	}
+	if _, ok := tmc.mutation.GuildID(); !ok {
+		return &ValidationError{Name: "guild_id", err: errors.New(`ent: missing required field "TypecastMessage.guild_id"`)}
+	}
 	if _, ok := tmc.mutation.ChannelID(); !ok {
 		return &ValidationError{Name: "channel_id", err: errors.New(`ent: missing required field "TypecastMessage.channel_id"`)}
 	}
@@ -260,12 +285,6 @@ func (tmc *TypecastMessageCreate) check() error {
 	}
 	if _, ok := tmc.mutation.StyleIdx(); !ok {
 		return &ValidationError{Name: "style_idx", err: errors.New(`ent: missing required field "TypecastMessage.style_idx"`)}
-	}
-	if _, ok := tmc.mutation.LastPitch(); !ok {
-		return &ValidationError{Name: "last_pitch", err: errors.New(`ent: missing required field "TypecastMessage.last_pitch"`)}
-	}
-	if _, ok := tmc.mutation.Mode(); !ok {
-		return &ValidationError{Name: "mode", err: errors.New(`ent: missing required field "TypecastMessage.mode"`)}
 	}
 	if _, ok := tmc.mutation.Pitch(); !ok {
 		return &ValidationError{Name: "pitch", err: errors.New(`ent: missing required field "TypecastMessage.pitch"`)}
@@ -325,6 +344,14 @@ func (tmc *TypecastMessageCreate) createSpec() (*TypecastMessage, *sqlgraph.Crea
 			Column: typecastmessage.FieldText,
 		})
 		_node.Text = value
+	}
+	if value, ok := tmc.mutation.GuildID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: typecastmessage.FieldGuildID,
+		})
+		_node.GuildID = value
 	}
 	if value, ok := tmc.mutation.ChannelID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -530,6 +557,18 @@ func (u *TypecastMessageUpsert) UpdateText() *TypecastMessageUpsert {
 	return u
 }
 
+// SetGuildID sets the "guild_id" field.
+func (u *TypecastMessageUpsert) SetGuildID(v string) *TypecastMessageUpsert {
+	u.Set(typecastmessage.FieldGuildID, v)
+	return u
+}
+
+// UpdateGuildID sets the "guild_id" field to the value that was provided on create.
+func (u *TypecastMessageUpsert) UpdateGuildID() *TypecastMessageUpsert {
+	u.SetExcluded(typecastmessage.FieldGuildID)
+	return u
+}
+
 // SetChannelID sets the "channel_id" field.
 func (u *TypecastMessageUpsert) SetChannelID(v string) *TypecastMessageUpsert {
 	u.Set(typecastmessage.FieldChannelID, v)
@@ -662,6 +701,12 @@ func (u *TypecastMessageUpsert) UpdateLastPitch() *TypecastMessageUpsert {
 	return u
 }
 
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (u *TypecastMessageUpsert) ClearLastPitch() *TypecastMessageUpsert {
+	u.SetNull(typecastmessage.FieldLastPitch)
+	return u
+}
+
 // SetMode sets the "mode" field.
 func (u *TypecastMessageUpsert) SetMode(v string) *TypecastMessageUpsert {
 	u.Set(typecastmessage.FieldMode, v)
@@ -671,6 +716,12 @@ func (u *TypecastMessageUpsert) SetMode(v string) *TypecastMessageUpsert {
 // UpdateMode sets the "mode" field to the value that was provided on create.
 func (u *TypecastMessageUpsert) UpdateMode() *TypecastMessageUpsert {
 	u.SetExcluded(typecastmessage.FieldMode)
+	return u
+}
+
+// ClearMode clears the value of the "mode" field.
+func (u *TypecastMessageUpsert) ClearMode() *TypecastMessageUpsert {
+	u.SetNull(typecastmessage.FieldMode)
 	return u
 }
 
@@ -838,6 +889,20 @@ func (u *TypecastMessageUpsertOne) UpdateText() *TypecastMessageUpsertOne {
 	})
 }
 
+// SetGuildID sets the "guild_id" field.
+func (u *TypecastMessageUpsertOne) SetGuildID(v string) *TypecastMessageUpsertOne {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.SetGuildID(v)
+	})
+}
+
+// UpdateGuildID sets the "guild_id" field to the value that was provided on create.
+func (u *TypecastMessageUpsertOne) UpdateGuildID() *TypecastMessageUpsertOne {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.UpdateGuildID()
+	})
+}
+
 // SetChannelID sets the "channel_id" field.
 func (u *TypecastMessageUpsertOne) SetChannelID(v string) *TypecastMessageUpsertOne {
 	return u.Update(func(s *TypecastMessageUpsert) {
@@ -992,6 +1057,13 @@ func (u *TypecastMessageUpsertOne) UpdateLastPitch() *TypecastMessageUpsertOne {
 	})
 }
 
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (u *TypecastMessageUpsertOne) ClearLastPitch() *TypecastMessageUpsertOne {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.ClearLastPitch()
+	})
+}
+
 // SetMode sets the "mode" field.
 func (u *TypecastMessageUpsertOne) SetMode(v string) *TypecastMessageUpsertOne {
 	return u.Update(func(s *TypecastMessageUpsert) {
@@ -1003,6 +1075,13 @@ func (u *TypecastMessageUpsertOne) SetMode(v string) *TypecastMessageUpsertOne {
 func (u *TypecastMessageUpsertOne) UpdateMode() *TypecastMessageUpsertOne {
 	return u.Update(func(s *TypecastMessageUpsert) {
 		s.UpdateMode()
+	})
+}
+
+// ClearMode clears the value of the "mode" field.
+func (u *TypecastMessageUpsertOne) ClearMode() *TypecastMessageUpsertOne {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.ClearMode()
 	})
 }
 
@@ -1346,6 +1425,20 @@ func (u *TypecastMessageUpsertBulk) UpdateText() *TypecastMessageUpsertBulk {
 	})
 }
 
+// SetGuildID sets the "guild_id" field.
+func (u *TypecastMessageUpsertBulk) SetGuildID(v string) *TypecastMessageUpsertBulk {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.SetGuildID(v)
+	})
+}
+
+// UpdateGuildID sets the "guild_id" field to the value that was provided on create.
+func (u *TypecastMessageUpsertBulk) UpdateGuildID() *TypecastMessageUpsertBulk {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.UpdateGuildID()
+	})
+}
+
 // SetChannelID sets the "channel_id" field.
 func (u *TypecastMessageUpsertBulk) SetChannelID(v string) *TypecastMessageUpsertBulk {
 	return u.Update(func(s *TypecastMessageUpsert) {
@@ -1500,6 +1593,13 @@ func (u *TypecastMessageUpsertBulk) UpdateLastPitch() *TypecastMessageUpsertBulk
 	})
 }
 
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (u *TypecastMessageUpsertBulk) ClearLastPitch() *TypecastMessageUpsertBulk {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.ClearLastPitch()
+	})
+}
+
 // SetMode sets the "mode" field.
 func (u *TypecastMessageUpsertBulk) SetMode(v string) *TypecastMessageUpsertBulk {
 	return u.Update(func(s *TypecastMessageUpsert) {
@@ -1511,6 +1611,13 @@ func (u *TypecastMessageUpsertBulk) SetMode(v string) *TypecastMessageUpsertBulk
 func (u *TypecastMessageUpsertBulk) UpdateMode() *TypecastMessageUpsertBulk {
 	return u.Update(func(s *TypecastMessageUpsert) {
 		s.UpdateMode()
+	})
+}
+
+// ClearMode clears the value of the "mode" field.
+func (u *TypecastMessageUpsertBulk) ClearMode() *TypecastMessageUpsertBulk {
+	return u.Update(func(s *TypecastMessageUpsert) {
+		s.ClearMode()
 	})
 }
 

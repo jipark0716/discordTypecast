@@ -94,6 +94,13 @@ func Text(v string) predicate.TypecastMessage {
 	})
 }
 
+// GuildID applies equality check predicate on the "guild_id" field. It's identical to GuildIDEQ.
+func GuildID(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGuildID), v))
+	})
+}
+
 // ChannelID applies equality check predicate on the "channel_id" field. It's identical to ChannelIDEQ.
 func ChannelID(v string) predicate.TypecastMessage {
 	return predicate.TypecastMessage(func(s *sql.Selector) {
@@ -401,6 +408,105 @@ func TextEqualFold(v string) predicate.TypecastMessage {
 func TextContainsFold(v string) predicate.TypecastMessage {
 	return predicate.TypecastMessage(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldText), v))
+	})
+}
+
+// GuildIDEQ applies the EQ predicate on the "guild_id" field.
+func GuildIDEQ(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDNEQ applies the NEQ predicate on the "guild_id" field.
+func GuildIDNEQ(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDIn applies the In predicate on the "guild_id" field.
+func GuildIDIn(vs ...string) predicate.TypecastMessage {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldGuildID), v...))
+	})
+}
+
+// GuildIDNotIn applies the NotIn predicate on the "guild_id" field.
+func GuildIDNotIn(vs ...string) predicate.TypecastMessage {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldGuildID), v...))
+	})
+}
+
+// GuildIDGT applies the GT predicate on the "guild_id" field.
+func GuildIDGT(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDGTE applies the GTE predicate on the "guild_id" field.
+func GuildIDGTE(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDLT applies the LT predicate on the "guild_id" field.
+func GuildIDLT(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDLTE applies the LTE predicate on the "guild_id" field.
+func GuildIDLTE(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDContains applies the Contains predicate on the "guild_id" field.
+func GuildIDContains(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDHasPrefix applies the HasPrefix predicate on the "guild_id" field.
+func GuildIDHasPrefix(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDHasSuffix applies the HasSuffix predicate on the "guild_id" field.
+func GuildIDHasSuffix(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDEqualFold applies the EqualFold predicate on the "guild_id" field.
+func GuildIDEqualFold(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldGuildID), v))
+	})
+}
+
+// GuildIDContainsFold applies the ContainsFold predicate on the "guild_id" field.
+func GuildIDContainsFold(v string) predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldGuildID), v))
 	})
 }
 
@@ -1141,6 +1247,20 @@ func LastPitchHasSuffix(v string) predicate.TypecastMessage {
 	})
 }
 
+// LastPitchIsNil applies the IsNil predicate on the "last_pitch" field.
+func LastPitchIsNil() predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldLastPitch)))
+	})
+}
+
+// LastPitchNotNil applies the NotNil predicate on the "last_pitch" field.
+func LastPitchNotNil() predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldLastPitch)))
+	})
+}
+
 // LastPitchEqualFold applies the EqualFold predicate on the "last_pitch" field.
 func LastPitchEqualFold(v string) predicate.TypecastMessage {
 	return predicate.TypecastMessage(func(s *sql.Selector) {
@@ -1237,6 +1357,20 @@ func ModeHasPrefix(v string) predicate.TypecastMessage {
 func ModeHasSuffix(v string) predicate.TypecastMessage {
 	return predicate.TypecastMessage(func(s *sql.Selector) {
 		s.Where(sql.HasSuffix(s.C(FieldMode), v))
+	})
+}
+
+// ModeIsNil applies the IsNil predicate on the "mode" field.
+func ModeIsNil() predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldMode)))
+	})
+}
+
+// ModeNotNil applies the NotNil predicate on the "mode" field.
+func ModeNotNil() predicate.TypecastMessage {
+	return predicate.TypecastMessage(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldMode)))
 	})
 }
 

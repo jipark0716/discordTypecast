@@ -11,6 +11,8 @@ const (
 	FieldUserID = "user_id"
 	// FieldText holds the string denoting the text field in the database.
 	FieldText = "text"
+	// FieldGuildID holds the string denoting the guild_id field in the database.
+	FieldGuildID = "guild_id"
 	// FieldChannelID holds the string denoting the channel_id field in the database.
 	FieldChannelID = "channel_id"
 	// FieldActorID holds the string denoting the actor_id field in the database.
@@ -52,6 +54,7 @@ var Columns = []string{
 	FieldID,
 	FieldUserID,
 	FieldText,
+	FieldGuildID,
 	FieldChannelID,
 	FieldActorID,
 	FieldLang,

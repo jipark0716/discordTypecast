@@ -37,6 +37,7 @@ type TypecastMessageMutation struct {
 	id                  *int
 	user_id             *string
 	text                *string
+	guild_id            *string
 	channel_id          *string
 	actor_id            *string
 	lang                *string
@@ -234,6 +235,42 @@ func (m *TypecastMessageMutation) OldText(ctx context.Context) (v string, err er
 // ResetText resets all changes to the "text" field.
 func (m *TypecastMessageMutation) ResetText() {
 	m.text = nil
+}
+
+// SetGuildID sets the "guild_id" field.
+func (m *TypecastMessageMutation) SetGuildID(s string) {
+	m.guild_id = &s
+}
+
+// GuildID returns the value of the "guild_id" field in the mutation.
+func (m *TypecastMessageMutation) GuildID() (r string, exists bool) {
+	v := m.guild_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGuildID returns the old "guild_id" field's value of the TypecastMessage entity.
+// If the TypecastMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TypecastMessageMutation) OldGuildID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGuildID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGuildID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGuildID: %w", err)
+	}
+	return oldValue.GuildID, nil
+}
+
+// ResetGuildID resets all changes to the "guild_id" field.
+func (m *TypecastMessageMutation) ResetGuildID() {
+	m.guild_id = nil
 }
 
 // SetChannelID sets the "channel_id" field.
@@ -635,9 +672,22 @@ func (m *TypecastMessageMutation) OldLastPitch(ctx context.Context) (v *string, 
 	return oldValue.LastPitch, nil
 }
 
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (m *TypecastMessageMutation) ClearLastPitch() {
+	m.last_pitch = nil
+	m.clearedFields[typecastmessage.FieldLastPitch] = struct{}{}
+}
+
+// LastPitchCleared returns if the "last_pitch" field was cleared in this mutation.
+func (m *TypecastMessageMutation) LastPitchCleared() bool {
+	_, ok := m.clearedFields[typecastmessage.FieldLastPitch]
+	return ok
+}
+
 // ResetLastPitch resets all changes to the "last_pitch" field.
 func (m *TypecastMessageMutation) ResetLastPitch() {
 	m.last_pitch = nil
+	delete(m.clearedFields, typecastmessage.FieldLastPitch)
 }
 
 // SetMode sets the "mode" field.
@@ -671,9 +721,22 @@ func (m *TypecastMessageMutation) OldMode(ctx context.Context) (v *string, err e
 	return oldValue.Mode, nil
 }
 
+// ClearMode clears the value of the "mode" field.
+func (m *TypecastMessageMutation) ClearMode() {
+	m.mode = nil
+	m.clearedFields[typecastmessage.FieldMode] = struct{}{}
+}
+
+// ModeCleared returns if the "mode" field was cleared in this mutation.
+func (m *TypecastMessageMutation) ModeCleared() bool {
+	_, ok := m.clearedFields[typecastmessage.FieldMode]
+	return ok
+}
+
 // ResetMode resets all changes to the "mode" field.
 func (m *TypecastMessageMutation) ResetMode() {
 	m.mode = nil
+	delete(m.clearedFields, typecastmessage.FieldMode)
 }
 
 // SetPitch sets the "pitch" field.
@@ -984,12 +1047,15 @@ func (m *TypecastMessageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TypecastMessageMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 19)
 	if m.user_id != nil {
 		fields = append(fields, typecastmessage.FieldUserID)
 	}
 	if m.text != nil {
 		fields = append(fields, typecastmessage.FieldText)
+	}
+	if m.guild_id != nil {
+		fields = append(fields, typecastmessage.FieldGuildID)
 	}
 	if m.channel_id != nil {
 		fields = append(fields, typecastmessage.FieldChannelID)
@@ -1051,6 +1117,8 @@ func (m *TypecastMessageMutation) Field(name string) (ent.Value, bool) {
 		return m.UserID()
 	case typecastmessage.FieldText:
 		return m.Text()
+	case typecastmessage.FieldGuildID:
+		return m.GuildID()
 	case typecastmessage.FieldChannelID:
 		return m.ChannelID()
 	case typecastmessage.FieldActorID:
@@ -1096,6 +1164,8 @@ func (m *TypecastMessageMutation) OldField(ctx context.Context, name string) (en
 		return m.OldUserID(ctx)
 	case typecastmessage.FieldText:
 		return m.OldText(ctx)
+	case typecastmessage.FieldGuildID:
+		return m.OldGuildID(ctx)
 	case typecastmessage.FieldChannelID:
 		return m.OldChannelID(ctx)
 	case typecastmessage.FieldActorID:
@@ -1150,6 +1220,13 @@ func (m *TypecastMessageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetText(v)
+		return nil
+	case typecastmessage.FieldGuildID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGuildID(v)
 		return nil
 	case typecastmessage.FieldChannelID:
 		v, ok := value.(string)
@@ -1380,6 +1457,12 @@ func (m *TypecastMessageMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *TypecastMessageMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(typecastmessage.FieldLastPitch) {
+		fields = append(fields, typecastmessage.FieldLastPitch)
+	}
+	if m.FieldCleared(typecastmessage.FieldMode) {
+		fields = append(fields, typecastmessage.FieldMode)
+	}
 	if m.FieldCleared(typecastmessage.FieldSendAt) {
 		fields = append(fields, typecastmessage.FieldSendAt)
 	}
@@ -1397,6 +1480,12 @@ func (m *TypecastMessageMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *TypecastMessageMutation) ClearField(name string) error {
 	switch name {
+	case typecastmessage.FieldLastPitch:
+		m.ClearLastPitch()
+		return nil
+	case typecastmessage.FieldMode:
+		m.ClearMode()
+		return nil
 	case typecastmessage.FieldSendAt:
 		m.ClearSendAt()
 		return nil
@@ -1413,6 +1502,9 @@ func (m *TypecastMessageMutation) ResetField(name string) error {
 		return nil
 	case typecastmessage.FieldText:
 		m.ResetText()
+		return nil
+	case typecastmessage.FieldGuildID:
+		m.ResetGuildID()
 		return nil
 	case typecastmessage.FieldChannelID:
 		m.ResetChannelID()

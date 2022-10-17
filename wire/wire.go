@@ -13,5 +13,6 @@ func NewDiscordService() (d discord.Discord, err error) {
 		return
 	}
 	userRepository := repositories.NewUserRepository(connection)
-	return discord.NewDiscord(typecastService, userRepository)
+	messageRepository := repositories.NewTypecastMessageRepository(connection)
+	return discord.NewDiscord(typecastService, userRepository, messageRepository)
 }

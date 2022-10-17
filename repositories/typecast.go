@@ -33,25 +33,25 @@ func (t *Typecast) GetActors() (actors []typecastgo.TypecastActor, err error) {
 	return
 }
 
-func (t *Typecast) Do(setting *ent.UserTypecastSetting, text string) ([]byte, error) {
+func (t *Typecast) Do(message *ent.TypecastMessage) ([]byte, error) {
 	request := &typecastgo.TypecastExecuteRequest{
-		ActorId:           setting.ActorID,
-		Text:              text,
-		Lang:              setting.Lang,
-		MaxSeconds:        setting.MaxSeconds,
-		Naturalness:       setting.Naturalness,
-		SpeedX:            setting.SpeedX,
-		Gid:               setting.Gid,
-		StyleIdx:          setting.StyleIdx,
-		LastPitch:         setting.LastPitch,
-		Pitch:             setting.Pitch,
-		StyleLabel:        setting.StyleLabel,
-		StyleLabelVersion: setting.StyleLabelVersion,
-		Tempo:             setting.Tempo,
+		ActorId:           message.ActorID,
+		Text:              message.Text,
+		Lang:              message.Lang,
+		MaxSeconds:        message.MaxSeconds,
+		Naturalness:       message.Naturalness,
+		SpeedX:            message.SpeedX,
+		Gid:               message.Gid,
+		StyleIdx:          message.StyleIdx,
+		LastPitch:         message.LastPitch,
+		Pitch:             message.Pitch,
+		StyleLabel:        message.StyleLabel,
+		StyleLabelVersion: message.StyleLabelVersion,
+		Tempo:             message.Tempo,
 	}
 
-	if setting.Mode != nil {
-		request.Mode = *setting.Mode
+	if message.Mode != nil {
+		request.Mode = *message.Mode
 	}
 
 	return t.Session.Do([]*typecastgo.TypecastExecuteRequest{request})

@@ -15,7 +15,7 @@ func init() {
 	typecastmessageFields := schema.TypecastMessage{}.Fields()
 	_ = typecastmessageFields
 	// typecastmessageDescStatus is the schema descriptor for status field.
-	typecastmessageDescStatus := typecastmessageFields[16].Descriptor()
+	typecastmessageDescStatus := typecastmessageFields[17].Descriptor()
 	// typecastmessage.DefaultStatus holds the default value on creation for the status field.
 	typecastmessage.DefaultStatus = typecastmessageDescStatus.Default.(int8)
 	usertypecastsettingFields := schema.UserTypecastSetting{}.Fields()

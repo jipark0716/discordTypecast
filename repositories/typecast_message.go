@@ -16,13 +16,14 @@ func NewTypecastMessageRepository(database *ent.Client) TypecastMessageRepositor
 	}
 }
 
-func (tr *TypecastMessageRepository) Create(setting ent.UserTypecastSetting, channelID string, text string) (*ent.TypecastMessage, error) {
-	return tr.
+func (tr *TypecastMessageRepository) Create(setting *ent.UserTypecastSetting, guildID string, channelID string, text string) (*ent.TypecastMessage, error) {
+	create := tr.
 		Database.
 		TypecastMessage.
 		Create().
 		SetUserID(setting.UserID).
 		SetText(text).
+		SetGuildID(guildID).
 		SetChannelID(channelID).
 		SetActorID(setting.ActorID).
 		SetLang(setting.Lang).
@@ -31,11 +32,18 @@ func (tr *TypecastMessageRepository) Create(setting ent.UserTypecastSetting, cha
 		SetSpeedX(setting.SpeedX).
 		SetGid(setting.Gid).
 		SetStyleIdx(setting.StyleIdx).
-		SetLastPitch(*setting.LastPitch).
-		SetMode(*setting.Mode).
 		SetPitch(setting.Pitch).
 		SetStyleLabel(setting.StyleLabel).
 		SetStyleLabelVersion(setting.StyleLabelVersion).
-		SetTempo(setting.Tempo).
-		Save(context.Background())
+		SetTempo(setting.Tempo)
+
+	if setting.LastPitch != nil {
+		create.SetLastPitch(*setting.LastPitch)
+	}
+
+	if setting.Mode != nil {
+		create.SetMode(*setting.Mode)
+	}
+
+	return create.Save(context.Background())
 }

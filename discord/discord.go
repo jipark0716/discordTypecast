@@ -2,7 +2,10 @@ package discord
 
 import (
 	"strings"
+	"sync"
+	"time"
 
+	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jipark0716/discordTypecast/config"
 	"github.com/jipark0716/discordTypecast/repositories"
@@ -10,19 +13,30 @@ import (
 
 type Discord struct {
 	*discordgo.Session
-	Typecast       repositories.Typecast
-	UserRepository repositories.UserRepository
-	ApplicationId  string
+	Typecast                  repositories.Typecast
+	UserRepository            repositories.UserRepository
+	TypecastMessageRepository repositories.TypecastMessageRepository
+	VoiceConnections          map[string]*VoiceConnection
+	ApplicationId             string
+}
+
+type VoiceConnection struct {
+	*discordgo.VoiceConnection
+	idleConnect chan (bool)
+	Mutex       *sync.Mutex
 }
 
 func NewDiscord(
 	typecast repositories.Typecast,
 	userRepository repositories.UserRepository,
+	messageRepository repositories.TypecastMessageRepository,
 ) (discord Discord, err error) {
 
 	discord = Discord{}
 	discord.UserRepository = userRepository
+	discord.VoiceConnections = make(map[string]*VoiceConnection)
 	discord.Typecast = typecast
+	discord.TypecastMessageRepository = messageRepository
 	discord.ApplicationId = config.Get("DISCORD_ID").(string)
 	discord.Session, err = discordgo.New(config.Get("DISCORD_TOKEN").(string))
 	return
@@ -121,4 +135,41 @@ func (d *Discord) OnInteractionMessageComponent(event *discordgo.InteractionCrea
 
 func (d *Discord) Close() {
 	d.Session.Close()
+}
+
+func (d *Discord) ChannelVoiceJoin(gID, cID string, mute, deaf bool) (voiceConnection *VoiceConnection, err error) {
+	voiceConnection, _ = d.VoiceConnections[gID]
+	if voiceConnection == nil {
+		var voice *discordgo.VoiceConnection
+		voice, err = d.Session.ChannelVoiceJoin(gID, cID, mute, deaf)
+		voiceConnection = &VoiceConnection{
+			VoiceConnection: voice,
+			Mutex:           &sync.Mutex{},
+			idleConnect:     make(chan bool),
+		}
+		d.VoiceConnections[gID] = voiceConnection
+	}
+	go d.DisconnectIdleConnect(voiceConnection)
+	return
+}
+
+func (d *Discord) RefreshIdleConnect(vc *VoiceConnection) {
+	vc.idleConnect <- true
+	go d.DisconnectIdleConnect(vc)
+}
+
+func (d *Discord) DisconnectIdleConnect(vc *VoiceConnection) {
+	select {
+	case <-vc.idleConnect:
+		break
+	case <-time.After(time.Second * 300):
+		vc.Disconnect()
+	}
+}
+
+func (vc *VoiceConnection) PlayAudioFile(filename string, stop <-chan bool) {
+	vc.Mutex.Lock()
+	defer vc.Mutex.Unlock()
+
+	dgvoice.PlayAudioFile(vc.VoiceConnection, filename, stop)
 }

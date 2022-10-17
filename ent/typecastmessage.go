@@ -20,6 +20,8 @@ type TypecastMessage struct {
 	UserID string `json:"user_id,omitempty"`
 	// Text holds the value of the "text" field.
 	Text string `json:"text,omitempty"`
+	// GuildID holds the value of the "guild_id" field.
+	GuildID string `json:"guild_id,omitempty"`
 	// ChannelID holds the value of the "channel_id" field.
 	ChannelID string `json:"channel_id,omitempty"`
 	// ActorID holds the value of the "actor_id" field.
@@ -63,7 +65,7 @@ func (*TypecastMessage) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case typecastmessage.FieldID, typecastmessage.FieldMaxSeconds, typecastmessage.FieldSpeedX, typecastmessage.FieldStyleIdx, typecastmessage.FieldPitch, typecastmessage.FieldTempo, typecastmessage.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case typecastmessage.FieldUserID, typecastmessage.FieldText, typecastmessage.FieldChannelID, typecastmessage.FieldActorID, typecastmessage.FieldLang, typecastmessage.FieldGid, typecastmessage.FieldLastPitch, typecastmessage.FieldMode, typecastmessage.FieldStyleLabel, typecastmessage.FieldStyleLabelVersion:
+		case typecastmessage.FieldUserID, typecastmessage.FieldText, typecastmessage.FieldGuildID, typecastmessage.FieldChannelID, typecastmessage.FieldActorID, typecastmessage.FieldLang, typecastmessage.FieldGid, typecastmessage.FieldLastPitch, typecastmessage.FieldMode, typecastmessage.FieldStyleLabel, typecastmessage.FieldStyleLabelVersion:
 			values[i] = new(sql.NullString)
 		case typecastmessage.FieldSendAt:
 			values[i] = new(sql.NullTime)
@@ -99,6 +101,12 @@ func (tm *TypecastMessage) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field text", values[i])
 			} else if value.Valid {
 				tm.Text = value.String
+			}
+		case typecastmessage.FieldGuildID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field guild_id", values[i])
+			} else if value.Valid {
+				tm.GuildID = value.String
 			}
 		case typecastmessage.FieldChannelID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -232,6 +240,9 @@ func (tm *TypecastMessage) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("text=")
 	builder.WriteString(tm.Text)
+	builder.WriteString(", ")
+	builder.WriteString("guild_id=")
+	builder.WriteString(tm.GuildID)
 	builder.WriteString(", ")
 	builder.WriteString("channel_id=")
 	builder.WriteString(tm.ChannelID)

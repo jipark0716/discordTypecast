@@ -40,6 +40,12 @@ func (tmu *TypecastMessageUpdate) SetText(s string) *TypecastMessageUpdate {
 	return tmu
 }
 
+// SetGuildID sets the "guild_id" field.
+func (tmu *TypecastMessageUpdate) SetGuildID(s string) *TypecastMessageUpdate {
+	tmu.mutation.SetGuildID(s)
+	return tmu
+}
+
 // SetChannelID sets the "channel_id" field.
 func (tmu *TypecastMessageUpdate) SetChannelID(s string) *TypecastMessageUpdate {
 	tmu.mutation.SetChannelID(s)
@@ -122,9 +128,37 @@ func (tmu *TypecastMessageUpdate) SetLastPitch(s string) *TypecastMessageUpdate 
 	return tmu
 }
 
+// SetNillableLastPitch sets the "last_pitch" field if the given value is not nil.
+func (tmu *TypecastMessageUpdate) SetNillableLastPitch(s *string) *TypecastMessageUpdate {
+	if s != nil {
+		tmu.SetLastPitch(*s)
+	}
+	return tmu
+}
+
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (tmu *TypecastMessageUpdate) ClearLastPitch() *TypecastMessageUpdate {
+	tmu.mutation.ClearLastPitch()
+	return tmu
+}
+
 // SetMode sets the "mode" field.
 func (tmu *TypecastMessageUpdate) SetMode(s string) *TypecastMessageUpdate {
 	tmu.mutation.SetMode(s)
+	return tmu
+}
+
+// SetNillableMode sets the "mode" field if the given value is not nil.
+func (tmu *TypecastMessageUpdate) SetNillableMode(s *string) *TypecastMessageUpdate {
+	if s != nil {
+		tmu.SetMode(*s)
+	}
+	return tmu
+}
+
+// ClearMode clears the value of the "mode" field.
+func (tmu *TypecastMessageUpdate) ClearMode() *TypecastMessageUpdate {
+	tmu.mutation.ClearMode()
 	return tmu
 }
 
@@ -298,6 +332,13 @@ func (tmu *TypecastMessageUpdate) sqlSave(ctx context.Context) (n int, err error
 			Column: typecastmessage.FieldText,
 		})
 	}
+	if value, ok := tmu.mutation.GuildID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: typecastmessage.FieldGuildID,
+		})
+	}
 	if value, ok := tmu.mutation.ChannelID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -389,10 +430,22 @@ func (tmu *TypecastMessageUpdate) sqlSave(ctx context.Context) (n int, err error
 			Column: typecastmessage.FieldLastPitch,
 		})
 	}
+	if tmu.mutation.LastPitchCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: typecastmessage.FieldLastPitch,
+		})
+	}
 	if value, ok := tmu.mutation.Mode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
+			Column: typecastmessage.FieldMode,
+		})
+	}
+	if tmu.mutation.ModeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
 			Column: typecastmessage.FieldMode,
 		})
 	}
@@ -496,6 +549,12 @@ func (tmuo *TypecastMessageUpdateOne) SetText(s string) *TypecastMessageUpdateOn
 	return tmuo
 }
 
+// SetGuildID sets the "guild_id" field.
+func (tmuo *TypecastMessageUpdateOne) SetGuildID(s string) *TypecastMessageUpdateOne {
+	tmuo.mutation.SetGuildID(s)
+	return tmuo
+}
+
 // SetChannelID sets the "channel_id" field.
 func (tmuo *TypecastMessageUpdateOne) SetChannelID(s string) *TypecastMessageUpdateOne {
 	tmuo.mutation.SetChannelID(s)
@@ -578,9 +637,37 @@ func (tmuo *TypecastMessageUpdateOne) SetLastPitch(s string) *TypecastMessageUpd
 	return tmuo
 }
 
+// SetNillableLastPitch sets the "last_pitch" field if the given value is not nil.
+func (tmuo *TypecastMessageUpdateOne) SetNillableLastPitch(s *string) *TypecastMessageUpdateOne {
+	if s != nil {
+		tmuo.SetLastPitch(*s)
+	}
+	return tmuo
+}
+
+// ClearLastPitch clears the value of the "last_pitch" field.
+func (tmuo *TypecastMessageUpdateOne) ClearLastPitch() *TypecastMessageUpdateOne {
+	tmuo.mutation.ClearLastPitch()
+	return tmuo
+}
+
 // SetMode sets the "mode" field.
 func (tmuo *TypecastMessageUpdateOne) SetMode(s string) *TypecastMessageUpdateOne {
 	tmuo.mutation.SetMode(s)
+	return tmuo
+}
+
+// SetNillableMode sets the "mode" field if the given value is not nil.
+func (tmuo *TypecastMessageUpdateOne) SetNillableMode(s *string) *TypecastMessageUpdateOne {
+	if s != nil {
+		tmuo.SetMode(*s)
+	}
+	return tmuo
+}
+
+// ClearMode clears the value of the "mode" field.
+func (tmuo *TypecastMessageUpdateOne) ClearMode() *TypecastMessageUpdateOne {
+	tmuo.mutation.ClearMode()
 	return tmuo
 }
 
@@ -784,6 +871,13 @@ func (tmuo *TypecastMessageUpdateOne) sqlSave(ctx context.Context) (_node *Typec
 			Column: typecastmessage.FieldText,
 		})
 	}
+	if value, ok := tmuo.mutation.GuildID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: typecastmessage.FieldGuildID,
+		})
+	}
 	if value, ok := tmuo.mutation.ChannelID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -875,10 +969,22 @@ func (tmuo *TypecastMessageUpdateOne) sqlSave(ctx context.Context) (_node *Typec
 			Column: typecastmessage.FieldLastPitch,
 		})
 	}
+	if tmuo.mutation.LastPitchCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: typecastmessage.FieldLastPitch,
+		})
+	}
 	if value, ok := tmuo.mutation.Mode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
+			Column: typecastmessage.FieldMode,
+		})
+	}
+	if tmuo.mutation.ModeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
 			Column: typecastmessage.FieldMode,
 		})
 	}

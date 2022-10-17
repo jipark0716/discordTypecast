@@ -1,17 +1,62 @@
 package discord
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
-	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jipark0716/discordTypecast/ent"
 	"github.com/jipark0716/discordTypecast/handler"
 )
 
 func (d *Discord) OnSpeakTts(event *discordgo.InteractionCreate) {
+	setting, err := d.UserRepository.FindByUserId(event.Member.User.ID)
+	if err != nil {
+		handler.Report(err)
+		return
+	}
+
+	if setting == nil {
+		d.InteractionRespond(
+			event.Interaction,
+			&discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "설정된 목소리가 없습니다.",
+				},
+			},
+		)
+		return
+	}
+
+	err = d.InteractionRespond(
+		event.Interaction,
+		&discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "말하는중",
+			},
+		},
+	)
+	if err != nil {
+		handler.Report(err)
+		return
+	}
+
+	defer func() {
+		err := d.InteractionResponseDelete(event.Interaction)
+		if err != nil {
+			handler.Report(err)
+		}
+	}()
+
+	if err != nil {
+		handler.Report((err))
+	}
+
 	channel, err := d.Channel(event.ChannelID)
 	if err != nil {
 		handler.Report(err)
@@ -34,31 +79,27 @@ func (d *Discord) OnSpeakTts(event *discordgo.InteractionCreate) {
 		return
 	}
 
-	setting, err := d.UserRepository.FindByUserId(event.Member.User.ID)
+	tyepcastMessage, err := d.TypecastMessageRepository.Create(setting, event.GuildID, channel.ID, content)
+
 	if err != nil {
 		handler.Report(err)
 		return
 	}
 
-	d.Speak(
-		channel,
-		content,
-		event.ID,
-		setting,
-	)
+	d.Speak(tyepcastMessage)
 }
 
-func (d *Discord) Speak(channel *discordgo.Channel, text string, messageID string, setting *ent.UserTypecastSetting) {
-	audio, err := d.Typecast.Do(setting, text)
+func (d *Discord) Speak(tyepcastMessage *ent.TypecastMessage) {
+	audio, err := d.Typecast.Do(tyepcastMessage)
 	if err != nil {
 		handler.Report(err)
 		return
 	}
 
 	audioFilePath := fmt.Sprintf(
-		"./queue/%s/%s",
-		channel.GuildID,
-		messageID,
+		"./queue/%s/%d",
+		tyepcastMessage.GuildID,
+		tyepcastMessage.ID,
 	)
 
 	err = ioutil.WriteFile(
@@ -71,15 +112,18 @@ func (d *Discord) Speak(channel *discordgo.Channel, text string, messageID strin
 		return
 	}
 
-	d.DispathVoice(channel, audioFilePath)
-}
-
-func (d *Discord) DispathVoice(channel *discordgo.Channel, audioFilePath string) {
-	voiceConnection, err := d.ChannelVoiceJoin(channel.GuildID, channel.ID, false, true)
+	voiceConnection, err := d.ChannelVoiceJoin(tyepcastMessage.GuildID, tyepcastMessage.ChannelID, false, true)
 	if err != nil {
 		handler.Report(err)
 	}
 
-	dgvoice.PlayAudioFile(voiceConnection, audioFilePath, make(chan bool))
+	voiceConnection.PlayAudioFile(audioFilePath, make(chan bool))
 	os.Remove(audioFilePath)
+	tyepcastMessage.
+		Update().
+		SetSendAt(time.Now()).
+		SetStatus(1).
+		Save(context.Background())
+
+	go d.RefreshIdleConnect(voiceConnection)
 }
