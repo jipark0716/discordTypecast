@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/jipark0716/discordTypecast/handler"
 	"github.com/jipark0716/discordTypecast/wire"
 	"github.com/spf13/cobra"
 )
@@ -15,8 +14,7 @@ var serveCmd = &cobra.Command{
 		session, err := wire.NewDiscordService()
 		err = session.Serve()
 		if err != nil {
-			println("fail")
-			fmt.Printf("%+v\n", err)
+			handler.Report(err)
 		} else {
 			println("connect server")
 		}
