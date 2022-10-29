@@ -96,9 +96,16 @@ func (d *Discord) Speak(tyepcastMessage *ent.TypecastMessage) {
 		return
 	}
 
-	audioFilePath := fmt.Sprintf(
-		"./queue/%s/%d",
+	audioFileDirectory := fmt.Sprintf(
+		"./queue/%s",
 		tyepcastMessage.GuildID,
+	)
+
+	os.MkdirAll(audioFileDirectory, os.ModePerm)
+
+	audioFilePath := fmt.Sprintf(
+		"%s/%d",
+		audioFileDirectory,
 		tyepcastMessage.ID,
 	)
 
