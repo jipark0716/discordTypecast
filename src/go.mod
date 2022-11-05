@@ -5,7 +5,7 @@ go 1.19
 require (
 	entgo.io/ent v0.11.3
 	github.com/aws/aws-sdk-go v1.44.114
-	github.com/jipark0716/typecastgo v0.0.0-20221009114031-b7f92cf999dd
+	github.com/jipark0716/typecastgo v0.0.0-20221105080325-e07551d0f2a1
 	github.com/spf13/cobra v1.5.0
 )
 
