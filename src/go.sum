@@ -41,6 +41,10 @@ github.com/jipark0716/typecastgo v0.0.0-20221009114031-b7f92cf999dd h1:HzdbqNWzR
 github.com/jipark0716/typecastgo v0.0.0-20221009114031-b7f92cf999dd/go.mod h1:gFaLidx8f+5KK8tGZk32qyyFNzpJ4uQzoHwUjph4bUE=
 github.com/jipark0716/typecastgo v0.0.0-20221105080325-e07551d0f2a1 h1:Md6TPHjGOjkz9+iI361yK6WRoHe3f//b4+CFLh53+Dc=
 github.com/jipark0716/typecastgo v0.0.0-20221105080325-e07551d0f2a1/go.mod h1:gFaLidx8f+5KK8tGZk32qyyFNzpJ4uQzoHwUjph4bUE=
+github.com/jipark0716/typecastgo v0.0.0-20221127085746-d3a7a15f4010 h1:0ZPgeko447YTeXpTiQPidTTL51Rxn+L71JJbUlu4MA8=
+github.com/jipark0716/typecastgo v0.0.0-20221127085746-d3a7a15f4010/go.mod h1:gFaLidx8f+5KK8tGZk32qyyFNzpJ4uQzoHwUjph4bUE=
+github.com/jipark0716/typecastgo v0.0.0-20221127092745-421e5a060ae0 h1:lnDTFMEZ9GvLQyNZicrOroBoRz8+RFjuTdbDymVPdgo=
+github.com/jipark0716/typecastgo v0.0.0-20221127092745-421e5a060ae0/go.mod h1:gFaLidx8f+5KK8tGZk32qyyFNzpJ4uQzoHwUjph4bUE=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=
